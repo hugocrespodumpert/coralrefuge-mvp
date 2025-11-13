@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { sendWaitlistConfirmation } from '@/lib/resend';
+import { sendWaitlistConfirmation } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {

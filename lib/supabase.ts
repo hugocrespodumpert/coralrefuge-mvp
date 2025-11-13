@@ -40,3 +40,22 @@ export interface RegistryEntry {
   is_anonymous: boolean;
   created_at?: string;
 }
+
+export interface Sponsorship {
+  id?: string;
+  stripe_session_id: string;
+  stripe_payment_intent?: string;
+  name: string;
+  email: string;
+  company?: string;
+  mpa_id: string;
+  mpa_name: string;
+  hectares: number;
+  amount: number;
+  is_anonymous: boolean;
+  payment_status: 'pending' | 'completed' | 'failed' | 'refunded';
+  certificate_status: 'pending' | 'generated' | 'sent';
+  certificate_url?: string;
+  created_at?: string;
+  updated_at?: string;
+}

@@ -81,37 +81,60 @@ export default function SponsorPage() {
     name: '',
     email: '',
     company: '',
-    interestedInPartnership: false,
+    isAnonymous: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const pricePerHectare = 50;
   const totalPrice = hectares * pricePerHectare;
 
   const handleSelectMPA = (mpa: MPA) => {
     setSelectedMPA(mpa);
-    setIsSuccess(false);
+    setError('');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleProceedToPayment = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+      // Create Stripe checkout session
+      const response = await fetch('/api/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          mpaId: selectedMPA?.id,
+          mpaName: selectedMPA?.name,
+          hectares,
+          isAnonymous: formData.isAnonymous,
+        }),
+      });
 
-    console.log({
-      ...formData,
-      mpa: selectedMPA?.id,
-      hectares,
-      amount: totalPrice,
-    });
+      const data = await response.json();
 
-    setIsSubmitting(false);
-    setIsSuccess(true);
-    setFormData({ name: '', email: '', company: '', interestedInPartnership: false });
-    setHectares(1);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (err) {
+      console.error('Checkout error:', err);
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+      setError(errorMessage);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -123,8 +146,12 @@ export default function SponsorPage() {
             Choose Your Coral Refuge to Protect
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Select a marine protected area and join the waitlist to become a guardian of climate-resilient coral reefs
+            Select a marine protected area and sponsor hectares to become a guardian of climate-resilient coral reefs
           </p>
+          {/* Test Mode Indicator */}
+          <div className="mt-4 inline-block bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold">
+            ⚠️ TEST MODE - Use card 4242 4242 4242 4242
+          </div>
         </div>
       </section>
 
@@ -203,121 +230,114 @@ export default function SponsorPage() {
         </div>
       </section>
 
-      {/* Waitlist Form */}
+      {/* Payment Form */}
       {selectedMPA && (
         <section className="py-12 bg-white">
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="bg-gradient-to-br from-ocean-blue/5 to-turquoise/5 rounded-2xl p-8 shadow-xl">
               <h2 className="text-3xl font-bold text-ocean-deep mb-2 text-center">
-                Join the Waitlist
+                Complete Your Sponsorship
               </h2>
               <p className="text-gray-600 text-center mb-8">
-                Be among the first guardians of {selectedMPA.name}
+                Protect {hectares} hectare{hectares > 1 ? 's' : ''} of {selectedMPA.name}
               </p>
 
-              {isSuccess ? (
-                <div className="text-center py-8">
-                  <div className="w-20 h-20 bg-turquoise rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-ocean-deep mb-2">You&apos;re on the list!</h3>
-                  <p className="text-gray-600 mb-6">
-                    Thank you for joining the movement to protect coral reefs. We&apos;ll be in touch soon with next steps.
-                  </p>
-                  <Button onClick={() => {
-                    setSelectedMPA(null);
-                    setIsSuccess(false);
-                  }}>
-                    Protect Another Refuge
-                  </Button>
+              {error && (
+                <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                  {error}
                 </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
-                      placeholder="John Doe"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
-                      placeholder="john@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Company Name (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
-                      placeholder="Your Company"
-                    />
-                  </div>
-
-                  <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
-                    <div className="flex justify-between mb-2">
-                      <span className="font-semibold text-gray-700">Selected MPA:</span>
-                      <span className="text-ocean-deep">{selectedMPA.name}</span>
-                    </div>
-                    <div className="flex justify-between mb-2">
-                      <span className="font-semibold text-gray-700">Hectares:</span>
-                      <span className="text-ocean-deep">{hectares}</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t">
-                      <span className="font-bold text-gray-700">Total:</span>
-                      <span className="font-bold text-turquoise text-xl">${totalPrice}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start">
-                    <input
-                      type="checkbox"
-                      id="partnership"
-                      checked={formData.interestedInPartnership}
-                      onChange={(e) => setFormData({ ...formData, interestedInPartnership: e.target.checked })}
-                      className="mt-1 w-5 h-5 text-turquoise border-gray-300 rounded focus:ring-turquoise"
-                    />
-                    <label htmlFor="partnership" className="ml-3 text-sm text-gray-600">
-                      I&apos;m interested in exploring corporate partnership opportunities
-                    </label>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {isSubmitting ? 'Joining Waitlist...' : 'Join Waitlist'}
-                  </Button>
-
-                  <p className="text-xs text-gray-500 text-center">
-                    By joining the waitlist, you&apos;ll be notified when sponsorships become available. No payment is required at this time.
-                  </p>
-                </form>
               )}
+
+              <form onSubmit={handleProceedToPayment} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
+                    placeholder="John Doe"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
+                    placeholder="john@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Company Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
+                    placeholder="Your Company"
+                  />
+                </div>
+
+                <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
+                  <div className="flex justify-between mb-2">
+                    <span className="font-semibold text-gray-700">Selected MPA:</span>
+                    <span className="text-ocean-deep">{selectedMPA.name}</span>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span className="font-semibold text-gray-700">Hectares:</span>
+                    <span className="text-ocean-deep">{hectares}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t">
+                    <span className="font-bold text-gray-700">Total:</span>
+                    <span className="font-bold text-turquoise text-xl">${totalPrice}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id="anonymous"
+                    checked={formData.isAnonymous}
+                    onChange={(e) => setFormData({ ...formData, isAnonymous: e.target.checked })}
+                    className="mt-1 w-5 h-5 text-turquoise border-gray-300 rounded focus:ring-turquoise"
+                  />
+                  <label htmlFor="anonymous" className="ml-3 text-sm text-gray-600">
+                    Make my sponsorship anonymous in the public registry
+                  </label>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full"
+                  size="lg"
+                >
+                  {isSubmitting ? 'Redirecting to Payment...' : 'Proceed to Payment'}
+                </Button>
+
+                <p className="text-xs text-gray-500 text-center">
+                  You will be redirected to Stripe&apos;s secure checkout page to complete your payment.
+                  Your certificate will be emailed within 24 hours.
+                </p>
+
+                <div className="bg-turquoise/10 rounded-lg p-4 text-center">
+                  <p className="text-sm text-gray-700">
+                    <strong>💳 Test Card:</strong> 4242 4242 4242 4242 | Exp: Any future date | CVC: Any 3 digits
+                  </p>
+                </div>
+              </form>
             </div>
           </div>
         </section>

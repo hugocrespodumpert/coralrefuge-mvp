@@ -69,7 +69,69 @@ CREATE INDEX idx_partnership_created ON partnership_inquiries(created_at DESC);
 - `message`: Optional message from the company
 - `created_at`: Timestamp of inquiry
 
-### 3. registry_entries
+### 3. sponsorships
+
+**NEW TABLE FOR PHASE 2A** - Stores completed sponsorships after successful Stripe payments.
+
+```sql
+CREATE TABLE sponsorships (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  stripe_session_id TEXT NOT NULL UNIQUE,
+  stripe_payment_intent TEXT,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  company TEXT,
+  mpa_id TEXT NOT NULL,
+  mpa_name TEXT NOT NULL,
+  hectares INTEGER NOT NULL,
+  amount INTEGER NOT NULL,
+  is_anonymous BOOLEAN DEFAULT false,
+  payment_status TEXT NOT NULL CHECK (payment_status IN ('pending', 'completed', 'failed', 'refunded')),
+  certificate_status TEXT NOT NULL DEFAULT 'pending' CHECK (certificate_status IN ('pending', 'generated', 'sent')),
+  certificate_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+);
+
+-- Create indexes for faster queries
+CREATE INDEX idx_sponsorships_email ON sponsorships(email);
+CREATE INDEX idx_sponsorships_mpa ON sponsorships(mpa_id);
+CREATE INDEX idx_sponsorships_stripe ON sponsorships(stripe_session_id);
+CREATE INDEX idx_sponsorships_status ON sponsorships(payment_status);
+CREATE INDEX idx_sponsorships_created ON sponsorships(created_at DESC);
+
+-- Trigger to update updated_at timestamp
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_sponsorships_updated_at BEFORE UPDATE ON sponsorships
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+**Fields:**
+- `id`: Unique identifier for each sponsorship
+- `stripe_session_id`: Unique Stripe checkout session ID
+- `stripe_payment_intent`: Stripe payment intent ID (optional)
+- `name`: Sponsor's full name
+- `email`: Sponsor's email address
+- `company`: Optional company name
+- `mpa_id`: ID of the sponsored MPA
+- `mpa_name`: Name of the sponsored MPA
+- `hectares`: Number of hectares sponsored
+- `amount`: Total amount paid in USD
+- `is_anonymous`: Whether to display anonymously in registry
+- `payment_status`: Payment status (pending, completed, failed, refunded)
+- `certificate_status`: Certificate generation status (pending, generated, sent)
+- `certificate_url`: URL to generated PDF certificate (optional)
+- `created_at`: Timestamp of sponsorship creation
+- `updated_at`: Timestamp of last update
+
+### 4. registry_entries
 
 Public registry of sponsored hectares (for display on the /registry page).
 
