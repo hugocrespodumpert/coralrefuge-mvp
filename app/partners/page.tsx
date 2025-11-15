@@ -39,68 +39,97 @@ export default function PartnersPage() {
   return (
     <main className="min-h-screen pt-24 pb-12">
       {/* Hero */}
-      <section className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white py-16">
+      <section className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
             Conservation as a Service
           </h1>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Integrate ocean protection into your business model and make measurable impact
+          <p className="text-2xl md:text-3xl text-white/95 max-w-4xl mx-auto font-semibold">
+            Make your customers protectors of the reef
           </p>
         </div>
       </section>
 
       {/* Partnership Models */}
-      <section className="py-16 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-ocean-deep text-center mb-12">
-            Partnership Models
+          <h2 className="text-5xl md:text-6xl font-bold text-ocean-deep text-center mb-20">
+            Three Ways to Partner
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {/* Revenue-Based */}
+            <div className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white rounded-2xl p-10 shadow-2xl hover:scale-105 transition-transform">
+              <div className="text-6xl mb-6 text-center">1</div>
+              <h3 className="text-3xl font-bold mb-4 text-center">Revenue-Based Partnership</h3>
+              <p className="text-xl leading-relaxed mb-6 text-white/90">
+                Donate a % of sales. We handle everything.
+              </p>
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur">
+                <p className="text-lg font-semibold mb-2">Perfect for:</p>
+                <p className="text-white/90">Eco-brands, dive operators, ocean-conscious businesses</p>
+              </div>
+            </div>
+
+            {/* Corporate Sponsorship */}
+            <div className="bg-gradient-to-br from-turquoise to-ocean-blue text-white rounded-2xl p-10 shadow-2xl hover:scale-105 transition-transform">
+              <div className="text-6xl mb-6 text-center">2</div>
+              <h3 className="text-3xl font-bold mb-4 text-center">Corporate Sponsorship</h3>
+              <p className="text-xl leading-relaxed mb-6 text-white/90">
+                Hire us to protect reefs aligned with your brand
+              </p>
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur">
+                <p className="text-lg font-semibold mb-2">Perfect for:</p>
+                <p className="text-white/90">ESG reporting, sustainability campaigns, brand alignment</p>
+              </div>
+            </div>
+
+            {/* Employee Engagement */}
+            <div className="bg-gradient-to-br from-ocean-blue via-turquoise to-ocean-deep text-white rounded-2xl p-10 shadow-2xl hover:scale-105 transition-transform">
+              <div className="text-6xl mb-6 text-center">3</div>
+              <h3 className="text-3xl font-bold mb-4 text-center">Employee Engagement</h3>
+              <p className="text-xl leading-relaxed mb-6 text-white/90">
+                Turn your team into ocean stewards
+              </p>
+              <div className="bg-white/10 rounded-lg p-6 backdrop-blur">
+                <p className="text-lg font-semibold mb-2">Perfect for:</p>
+                <p className="text-white/90">Team building, CSR programs, employee benefits</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Target Clients */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl md:text-6xl font-bold text-ocean-deep text-center mb-16">
+            Who We Work With
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Revenue-Based */}
-            <div className="bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-to-br from-ocean-blue to-turquoise rounded-full flex items-center justify-center text-3xl mb-6">
-                💰
-              </div>
-              <h3 className="text-2xl font-bold text-ocean-deep mb-4">Revenue-Based</h3>
-              <p className="text-gray-700 mb-4">
-                Donate a percentage of sales to protect coral reefs. Perfect for eco-conscious brands wanting ongoing impact.
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="text-5xl mb-4">🏨</div>
+              <h3 className="text-2xl font-bold text-ocean-deep mb-3">Egyptian Resorts & Dive Centers</h3>
+              <p className="text-gray-600">
+                Local businesses with direct connection to Egypt&apos;s Red Sea reefs
               </p>
-              <div className="bg-white rounded-lg p-4 border-l-4 border-turquoise">
-                <p className="text-sm font-semibold text-gray-700">Example:</p>
-                <p className="text-sm text-gray-600">1% of monthly revenue = X hectares protected</p>
-              </div>
             </div>
 
-            {/* Flat Commitment */}
-            <div className="bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-to-br from-ocean-blue to-turquoise rounded-full flex items-center justify-center text-3xl mb-6">
-                📊
-              </div>
-              <h3 className="text-2xl font-bold text-ocean-deep mb-4">Flat Commitment</h3>
-              <p className="text-gray-700 mb-4">
-                Annual or monthly MPA sponsorship with predictable costs. Ideal for ESG reporting and sustainability goals.
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="text-5xl mb-4">✈️</div>
+              <h3 className="text-2xl font-bold text-ocean-deep mb-3">Tour Operators</h3>
+              <p className="text-gray-600">
+                Travel companies bringing visitors to experience coral reefs
               </p>
-              <div className="bg-white rounded-lg p-4 border-l-4 border-turquoise">
-                <p className="text-sm font-semibold text-gray-700">Example:</p>
-                <p className="text-sm text-gray-600">$5,000/year protects 100 hectares annually</p>
-              </div>
             </div>
 
-            {/* Custom Programs */}
-            <div className="bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8 hover:shadow-xl transition-shadow">
-              <div className="w-16 h-16 bg-gradient-to-br from-ocean-blue to-turquoise rounded-full flex items-center justify-center text-3xl mb-6">
-                🤝
-              </div>
-              <h3 className="text-2xl font-bold text-ocean-deep mb-4">Custom Programs</h3>
-              <p className="text-gray-700 mb-4">
-                Tailored conservation partnerships aligned with your brand values and business objectives.
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="text-5xl mb-4">🌍</div>
+              <h3 className="text-2xl font-bold text-ocean-deep mb-3">Global Brands</h3>
+              <p className="text-gray-600">
+                Companies inspired by Patagonia, Prada, and Rolex ocean initiatives
               </p>
-              <div className="bg-white rounded-lg p-4 border-l-4 border-turquoise">
-                <p className="text-sm font-semibold text-gray-700">Example:</p>
-                <p className="text-sm text-gray-600">Product-linked campaigns, employee engagement programs</p>
-              </div>
             </div>
           </div>
         </div>
@@ -313,10 +342,10 @@ export default function PartnersPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full"
+                  className="w-full bg-coral text-white hover:bg-coral/90"
                   size="lg"
                 >
-                  {isSubmitting ? 'Sending Request...' : 'Request Partnership Info'}
+                  {isSubmitting ? 'Sending Request...' : "Let's Make Waves"}
                 </Button>
               </form>
             )}

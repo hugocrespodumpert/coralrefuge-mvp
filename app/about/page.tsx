@@ -31,39 +31,71 @@ export default function AboutPage() {
       </section>
 
       {/* What Are Coral Refugia */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-ocean-deep mb-8 text-center">
-            What Are Coral Refugia?
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl md:text-6xl font-bold text-ocean-deep mb-12 text-center">
+            What are Coral Refugia?
           </h2>
-          <div className="bg-white rounded-2xl p-8 shadow-lg">
-            <div className="prose prose-lg max-w-none text-gray-700">
-              <p className="leading-relaxed mb-6">
-                <strong>Coral refugia</strong> are special reef areas with unique environmental conditions that help them survive rising ocean temperatures and other climate change impacts.
-              </p>
-              <p className="leading-relaxed mb-6">
-                These refuges might benefit from:
-              </p>
-              <ul className="space-y-3 mb-6">
+
+          <div className="bg-white rounded-2xl p-10 shadow-2xl mb-12">
+            <p className="text-3xl font-bold text-ocean-deep mb-8 text-center">
+              Think of refugia as genetic seed banks for the ocean
+            </p>
+            <p className="text-xl text-gray-700 leading-relaxed mb-8">
+              Coral refugia are rare reef ecosystems with unique conditions that allow them to survive warming seas.
+              While 90% of reefs may bleach and die, these special places can weather the storm—preserving biodiversity
+              and serving as sources for reef recovery worldwide.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="relative h-80 rounded-xl overflow-hidden shadow-lg">
+                <img
+                  src="https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80"
+                  alt="Healthy coral reef refugia"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="relative h-80 rounded-xl overflow-hidden shadow-lg">
+                <img
+                  src="https://images.unsplash.com/photo-1546500840-ae38253aba9b?w=800&q=80"
+                  alt="Diverse coral species"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-turquoise/10 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-ocean-deep mb-4">What Makes a Refugia?</h3>
+              <ul className="space-y-4">
                 <li className="flex items-start">
-                  <span className="text-turquoise mr-2">🌊</span>
-                  <span><strong>Upwelling currents</strong> that bring cooler, nutrient-rich water</span>
+                  <div className="w-3 h-3 bg-turquoise rounded-full mt-2 mr-4 flex-shrink-0"></div>
+                  <span className="text-lg text-gray-700"><strong>Cooler water circulation</strong> from deep channels</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-turquoise mr-2">🏔️</span>
-                  <span><strong>Deep water access</strong> where corals can retreat during heat waves</span>
+                  <div className="w-3 h-3 bg-turquoise rounded-full mt-2 mr-4 flex-shrink-0"></div>
+                  <span className="text-lg text-gray-700"><strong>Strong currents</strong> providing nutrients and temperature regulation</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-turquoise mr-2">🧬</span>
-                  <span><strong>Genetic adaptations</strong> that make them more heat-tolerant</span>
+                  <div className="w-3 h-3 bg-turquoise rounded-full mt-2 mr-4 flex-shrink-0"></div>
+                  <span className="text-lg text-gray-700"><strong>Genetic diversity</strong> with heat-tolerant coral strains</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-turquoise mr-2">🌍</span>
-                  <span><strong>Geographic protection</strong> from storm damage and bleaching events</span>
+                  <div className="w-3 h-3 bg-turquoise rounded-full mt-2 mr-4 flex-shrink-0"></div>
+                  <span className="text-lg text-gray-700"><strong>Geographic isolation</strong> from major stressors</span>
                 </li>
               </ul>
-              <p className="leading-relaxed">
-                By protecting these refugia now, we ensure that coral reefs can survive, adapt, and eventually help restore degraded reef systems worldwide.
+            </div>
+
+            <div className="bg-ocean-deep/5 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-ocean-deep mb-4">The Science</h3>
+              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+                We leverage the <strong>50 Reefs</strong> initiative and <strong>Allen Coral Atlas</strong> to identify
+                these critical areas.
+              </p>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                Protected reefs in refugia <strong>recover 40% faster</strong> than unprotected areas. By safeguarding
+                these ecosystems now, we preserve the coral genes that will repopulate tomorrow&apos;s oceans.
               </p>
             </div>
           </div>
@@ -121,35 +153,40 @@ export default function AboutPage() {
       </section>
 
       {/* Our Approach */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-4xl font-bold text-ocean-deep mb-8 text-center">Our Approach</h2>
-          <div className="space-y-6">
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-ocean-deep mb-3">🎯 Science-Based Selection</h3>
-              <p className="text-gray-600">
-                We work with marine scientists to identify true climate refugia based on peer-reviewed research and long-term monitoring data.
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-5xl md:text-6xl font-bold text-ocean-deep mb-16 text-center">Our Approach</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white rounded-2xl p-10 shadow-xl">
+              <h3 className="text-3xl font-bold mb-4">Leverage the Science</h3>
+              <p className="text-xl leading-relaxed">
+                We partner with the <strong>50 Reefs</strong> initiative and use data from the <strong>Allen Coral Atlas</strong>.
+                Every refugia is backed by peer-reviewed research and satellite mapping.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-ocean-deep mb-3">🤝 Local Partnerships</h3>
-              <p className="text-gray-600">
-                All funding goes to established marine protected areas and local conservation organizations with deep community connections.
+            <div className="bg-gradient-to-br from-turquoise to-ocean-blue text-white rounded-2xl p-10 shadow-xl">
+              <h3 className="text-3xl font-bold mb-4">Partner with Local MPAs</h3>
+              <p className="text-xl leading-relaxed">
+                100% of funds go to established marine protected areas like <strong>HEPCA</strong> in Egypt.
+                These are organizations with decades of proven conservation success.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-ocean-deep mb-3">📊 Transparent Impact</h3>
-              <p className="text-gray-600">
-                Every sponsor receives regular updates on how their funds are used and the measurable conservation outcomes achieved.
+            <div className="bg-gradient-to-br from-ocean-blue to-turquoise text-white rounded-2xl p-10 shadow-xl">
+              <h3 className="text-3xl font-bold mb-4">Radical Transparency</h3>
+              <p className="text-xl leading-relaxed">
+                GPS coordinates. Quarterly reports. Real data on coral health and biodiversity.
+                You&apos;ll know exactly where your money goes and what it achieves.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-md">
-              <h3 className="text-xl font-bold text-ocean-deep mb-3">🌍 Global Network</h3>
-              <p className="text-gray-600">
-                By connecting refugia across oceans, we build resilience into the global coral reef system and support ecosystem recovery.
+            <div className="bg-gradient-to-br from-ocean-deep via-ocean-blue to-turquoise text-white rounded-2xl p-10 shadow-xl">
+              <h3 className="text-3xl font-bold mb-4">Proven Model</h3>
+              <p className="text-xl leading-relaxed">
+                Protected reefs in refugia <strong>recover 40% faster</strong> than unprotected areas.
+                This isn&apos;t just conservation—it&apos;s climate adaptation.
               </p>
             </div>
           </div>
