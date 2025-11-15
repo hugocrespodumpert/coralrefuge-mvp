@@ -2,6 +2,24 @@
 
 import { useState, useEffect } from 'react';
 import Button from '@/components/Button';
+import { supabase } from '@/lib/supabase';
+
+interface Sponsorship {
+  id: string;
+  certificate_id: string;
+  sponsor_name: string;
+  sponsor_email: string;
+  company?: string;
+  mpa_id: string;
+  mpa_name: string;
+  mpa_location: string;
+  hectares: number;
+  amount_paid: number;
+  is_anonymous: boolean;
+  status: string;
+  email_sent_at?: string;
+  created_at: string;
+}
 
 interface WaitlistEntry {
   id: string;
@@ -29,9 +47,11 @@ interface PartnershipEntry {
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [activeTab, setActiveTab] = useState<'waitlist' | 'partnerships'>('waitlist');
+  const [activeTab, setActiveTab] = useState<'sponsorships' | 'waitlist' | 'partnerships'>('sponsorships');
+  const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [waitlistEntries, setWaitlistEntries] = useState<WaitlistEntry[]>([]);
   const [partnershipEntries, setPartnershipEntries] = useState<PartnershipEntry[]>([]);
+  const [isResending, setIsResending] = useState<string | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,36 +73,75 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // In production, these would fetch from the actual API
-      // For now, using placeholder data
-      setWaitlistEntries([
-        {
-          id: '1',
-          name: 'John Doe',
-          email: 'john@example.com',
-          company: 'Tech Corp',
-          mpa_id: 'ras-mohammed',
-          hectares: 10,
-          amount: 500,
-          interested_in_partnership: true,
-          created_at: new Date().toISOString(),
-        },
-      ]);
-
-      setPartnershipEntries([
-        {
-          id: '1',
-          company_name: 'EcoTech Solutions',
-          contact_name: 'Jane Smith',
-          email: 'jane@ecotech.com',
-          company_size: '51-200',
-          interest_type: 'revenue-based',
-          message: 'Interested in integrating coral protection into our product line.',
-          created_at: new Date().toISOString(),
-        },
-      ]);
+      fetchSponsorships();
+      fetchWaitlistEntries();
+      fetchPartnershipEntries();
     }
   }, [isAuthenticated]);
+
+  const fetchSponsorships = async () => {
+    const { data, error } = await supabase
+      .from('sponsorships')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching sponsorships:', error);
+    } else {
+      setSponsorships(data || []);
+    }
+  };
+
+  const fetchWaitlistEntries = async () => {
+    const { data, error } = await supabase
+      .from('waitlist_signups')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching waitlist:', error);
+    } else {
+      setWaitlistEntries(data || []);
+    }
+  };
+
+  const fetchPartnershipEntries = async () => {
+    const { data, error } = await supabase
+      .from('partnership_inquiries')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching partnerships:', error);
+    } else {
+      setPartnershipEntries(data || []);
+    }
+  };
+
+  const handleResendCertificate = async (sponsorship: Sponsorship) => {
+    if (!confirm(`Resend certificate to ${sponsorship.sponsor_email}?`)) return;
+
+    setIsResending(sponsorship.id);
+    try {
+      const response = await fetch('/api/resend-certificate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sponsorshipId: sponsorship.id }),
+      });
+
+      if (response.ok) {
+        alert('Certificate resent successfully!');
+        fetchSponsorships();
+      } else {
+        alert('Failed to resend certificate');
+      }
+    } catch (error) {
+      console.error('Error resending certificate:', error);
+      alert('Error resending certificate');
+    } finally {
+      setIsResending(null);
+    }
+  };
 
   if (!isAuthenticated) {
     return (
@@ -136,24 +195,30 @@ export default function AdminPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="text-3xl font-bold text-turquoise mb-2">
+              {sponsorships.length}
+            </div>
+            <div className="text-gray-600">Active Sponsorships</div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="text-3xl font-bold text-turquoise mb-2">
+              {sponsorships.reduce((sum, s) => sum + s.hectares, 0)}
+            </div>
+            <div className="text-gray-600">Hectares Protected</div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-md">
+            <div className="text-3xl font-bold text-turquoise mb-2">
+              ${sponsorships.reduce((sum, s) => sum + s.amount_paid, 0).toLocaleString()}
+            </div>
+            <div className="text-gray-600">Total Revenue</div>
+          </div>
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="text-3xl font-bold text-turquoise mb-2">
               {waitlistEntries.length}
             </div>
             <div className="text-gray-600">Waitlist Signups</div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-md">
-            <div className="text-3xl font-bold text-turquoise mb-2">
-              {partnershipEntries.length}
-            </div>
-            <div className="text-gray-600">Partnership Inquiries</div>
-          </div>
-          <div className="bg-white rounded-xl p-6 shadow-md">
-            <div className="text-3xl font-bold text-turquoise mb-2">
-              {waitlistEntries.reduce((sum, entry) => sum + entry.hectares, 0)}
-            </div>
-            <div className="text-gray-600">Total Hectares</div>
           </div>
         </div>
 
@@ -162,6 +227,16 @@ export default function AdminPage() {
           <div className="border-b border-gray-200">
             <div className="flex">
               <button
+                onClick={() => setActiveTab('sponsorships')}
+                className={`flex-1 px-6 py-4 font-semibold ${
+                  activeTab === 'sponsorships'
+                    ? 'text-turquoise border-b-2 border-turquoise'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                Sponsorships ({sponsorships.length})
+              </button>
+              <button
                 onClick={() => setActiveTab('waitlist')}
                 className={`flex-1 px-6 py-4 font-semibold ${
                   activeTab === 'waitlist'
@@ -169,7 +244,7 @@ export default function AdminPage() {
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Waitlist Signups
+                Waitlist ({waitlistEntries.length})
               </button>
               <button
                 onClick={() => setActiveTab('partnerships')}
@@ -179,13 +254,71 @@ export default function AdminPage() {
                     : 'text-gray-500 hover:text-gray-700'
                 }`}
               >
-                Partnership Inquiries
+                Partnerships ({partnershipEntries.length})
               </button>
             </div>
           </div>
 
           <div className="p-6">
-            {activeTab === 'waitlist' ? (
+            {activeTab === 'sponsorships' ? (
+              <div className="space-y-4">
+                <h2 className="text-2xl font-bold text-ocean-deep mb-4">Active Sponsorships</h2>
+                {sponsorships.length === 0 ? (
+                  <p className="text-gray-500">No sponsorships yet.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b-2 border-gray-200">
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Certificate ID</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Sponsor</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">MPA</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Hectares</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Amount</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sponsorships.map((sponsorship) => (
+                          <tr key={sponsorship.id} className="border-b border-gray-100 hover:bg-gray-50">
+                            <td className="py-3 px-4 font-mono text-sm">{sponsorship.certificate_id}</td>
+                            <td className="py-3 px-4">
+                              {sponsorship.is_anonymous ? '🔒 Anonymous' : sponsorship.sponsor_name}
+                            </td>
+                            <td className="py-3 px-4 text-sm">{sponsorship.sponsor_email}</td>
+                            <td className="py-3 px-4 text-sm">{sponsorship.mpa_name}</td>
+                            <td className="py-3 px-4">{sponsorship.hectares}</td>
+                            <td className="py-3 px-4">${sponsorship.amount_paid}</td>
+                            <td className="py-3 px-4 text-sm">
+                              {new Date(sponsorship.created_at).toLocaleDateString()}
+                            </td>
+                            <td className="py-3 px-4">
+                              {sponsorship.email_sent_at ? (
+                                <span className="text-green-600 text-sm">✓ Sent</span>
+                              ) : (
+                                <span className="text-yellow-600 text-sm">⚠ Pending</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4">
+                              <button
+                                onClick={() => handleResendCertificate(sponsorship)}
+                                disabled={isResending === sponsorship.id}
+                                className="text-turquoise hover:text-ocean-blue font-semibold text-sm disabled:opacity-50"
+                              >
+                                {isResending === sponsorship.id ? 'Sending...' : 'Resend'}
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ) : activeTab === 'waitlist' ? (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-ocean-deep mb-4">Waitlist Signups</h2>
                 {waitlistEntries.length === 0 ? (

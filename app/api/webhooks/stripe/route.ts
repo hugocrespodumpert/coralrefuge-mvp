@@ -1,167 +1,233 @@
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-import { stripe } from '@/lib/stripe';
+import Stripe from 'stripe';
 import { supabase } from '@/lib/supabase';
-import { sendPaymentConfirmation, sendAdminNotification } from '@/lib/email';
+import { generateCertificate, formatCertificateDate } from '@/lib/certificate-generator';
+import { sendCertificateEmail, sendAdminNotification } from '@/lib/email';
 
-export async function POST(request: Request) {
-  const body = await request.text();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2025-10-29.clover',
+  typescript: true,
+});
+
+// MPA data for location lookups
+const MPA_DATA: Record<string, { location: string; coordinates: string }> = {
+  'ras-mohammed': {
+    location: 'South Sinai, Egypt',
+    coordinates: '27.8°N, 34.2°E',
+  },
+  'giftun-islands': {
+    location: 'Hurghada, Red Sea, Egypt',
+    coordinates: '27.2°N, 33.9°E',
+  },
+  'wadi-el-gemal': {
+    location: 'Marsa Alam, Red Sea, Egypt',
+    coordinates: '24.7°N, 35.1°E',
+  },
+};
+
+/**
+ * Stripe webhook handler - processes payment completion events
+ */
+export async function POST(req: Request) {
+  const body = await req.text();
   const signature = headers().get('stripe-signature');
 
   if (!signature) {
+    console.error('Missing Stripe signature');
     return NextResponse.json(
-      { error: 'No signature provided' },
+      { error: 'Missing signature' },
       { status: 400 }
     );
   }
 
-  let event;
+  let event: Stripe.Event;
 
   try {
+    // Verify webhook signature
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET || ''
+      process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-    console.error('Webhook signature verification failed:', errorMessage);
+    const error = err as Error;
+    console.error('Webhook signature verification failed:', error.message);
     return NextResponse.json(
-      { error: `Webhook Error: ${errorMessage}` },
+      { error: `Webhook Error: ${error.message}` },
       { status: 400 }
     );
   }
 
   // Handle the event
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object;
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object as Stripe.Checkout.Session;
 
-      // Extract metadata
-      const {
-        name,
-        email,
-        company,
-        mpaId,
-        mpaName,
-        hectares,
-        amount,
-        isAnonymous,
-      } = session.metadata || {};
+    console.log('Payment completed for session:', session.id);
 
-      if (!name || !email || !mpaId || !mpaName || !hectares || !amount) {
-        console.error('Missing metadata in checkout session:', session.metadata);
-        break;
-      }
+    try {
+      await handleSuccessfulPayment(session);
+    } catch (error) {
+      console.error('Error processing successful payment:', error);
 
-      try {
-        // Save to Supabase sponsorships table
-        const { data: sponsorship, error: sponsorshipError } = await supabase
-          .from('sponsorships')
-          .insert({
-            stripe_session_id: session.id,
-            stripe_payment_intent: session.payment_intent,
-            name,
-            email,
-            company: company || null,
-            mpa_id: mpaId,
-            mpa_name: mpaName,
-            hectares: parseInt(hectares),
-            amount: parseInt(amount),
-            is_anonymous: isAnonymous === 'true',
-            payment_status: 'completed',
-            certificate_status: 'pending',
-          })
-          .select()
-          .single();
-
-        if (sponsorshipError) {
-          console.error('Error saving sponsorship:', sponsorshipError);
-          throw sponsorshipError;
-        }
-
-        // Add to public registry (if not anonymous)
-        if (isAnonymous !== 'true') {
-          await supabase.from('registry_entries').insert({
-            sponsor_name: name,
-            company: company || null,
-            mpa_name: mpaName,
-            hectares: parseInt(hectares),
-            date: new Date().toISOString().split('T')[0],
-            is_anonymous: false,
-          });
-        } else {
-          // Add anonymous entry
-          await supabase.from('registry_entries').insert({
-            sponsor_name: 'Anonymous Sponsor',
-            company: company || null,
-            mpa_name: mpaName,
-            hectares: parseInt(hectares),
-            date: new Date().toISOString().split('T')[0],
-            is_anonymous: true,
-          });
-        }
-
-        // Send confirmation email to sponsor
-        await sendPaymentConfirmation(
-          email,
-          name,
-          mpaName,
-          parseInt(hectares),
-          parseInt(amount)
-        );
-
-        // Send admin notification
-        await sendAdminNotification(
-          'New Sponsorship Received!',
-          `A new sponsorship has been completed.`,
-          {
-            'Sponsor': name,
-            'Email': email,
-            'Company': company || 'N/A',
-            'MPA': mpaName,
-            'Hectares': hectares,
-            'Amount': `$${amount}`,
-            'Session ID': session.id,
-          }
-        );
-
-        console.log('Sponsorship processed successfully:', sponsorship.id);
-      } catch (error) {
-        console.error('Error processing payment:', error);
-
-        // Send error notification to admin
-        await sendAdminNotification(
-          'Error Processing Sponsorship Payment',
-          'An error occurred while processing a sponsorship payment. Please check logs.',
-          {
-            'Session ID': session.id,
-            'Error': error instanceof Error ? error.message : 'Unknown error',
-          }
-        );
-      }
-      break;
-    }
-
-    case 'payment_intent.payment_failed': {
-      const paymentIntent = event.data.object;
-      console.log('Payment failed:', paymentIntent.id);
-
-      // Notify admin of failed payment
+      // Send admin notification about the error
       await sendAdminNotification(
-        'Payment Failed',
-        'A payment attempt has failed.',
+        '🚨 Certificate Generation Failed',
+        `Failed to process payment and generate certificate for session ${session.id}. Manual intervention required.`,
         {
-          'Payment Intent ID': paymentIntent.id,
-          'Error': paymentIntent.last_payment_error?.message || 'Unknown error',
+          'Session ID': session.id,
+          'Customer Email': session.customer_email || 'unknown',
+          'Error': error instanceof Error ? error.message : 'Unknown error',
         }
       );
-      break;
-    }
 
-    default:
-      console.log(`Unhandled event type: ${event.type}`);
+      // Return 200 to acknowledge receipt (don't retry automatically)
+      return NextResponse.json({
+        received: true,
+        error: 'Processing failed, admin notified',
+      });
+    }
   }
 
   return NextResponse.json({ received: true });
+}
+
+/**
+ * Process a successful payment:
+ * 1. Generate certificate ID
+ * 2. Save sponsorship to database
+ * 3. Generate PDF certificate
+ * 4. Send email with certificate
+ * 5. Notify admin
+ */
+async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
+  // Extract metadata from the session
+  const metadata = session.metadata!;
+  const sponsorName = metadata.name;
+  const sponsorEmail = metadata.email || session.customer_email!;
+  const company = metadata.company || null;
+  const mpaId = metadata.mpaId;
+  const mpaName = metadata.mpaName;
+  const hectares = parseInt(metadata.hectares);
+  const amount = parseInt(metadata.amount);
+  const isAnonymous = metadata.isAnonymous === 'true';
+
+  console.log('Processing payment for:', {
+    sponsorName,
+    sponsorEmail,
+    mpaName,
+    hectares,
+    amount,
+  });
+
+  // Get MPA location data
+  const mpaData = MPA_DATA[mpaId] || {
+    location: 'Red Sea, Egypt',
+    coordinates: 'Unknown',
+  };
+
+  // Step 1: Generate unique certificate ID
+  // First, get the count of existing sponsorships for this MPA this year
+  const currentYear = new Date().getFullYear();
+  const { count } = await supabase
+    .from('sponsorships')
+    .select('*', { count: 'exact', head: true })
+    .eq('mpa_id', mpaId)
+    .gte('created_at', `${currentYear}-01-01`)
+    .lte('created_at', `${currentYear}-12-31`);
+
+  const sequenceNumber = (count || 0) + 1;
+  const mpaPrefix = mpaId.replace('-', '').substring(0, 3).toUpperCase();
+  const certificateId = `${mpaPrefix}-${currentYear}-${sequenceNumber.toString().padStart(5, '0')}`;
+
+  console.log('Generated certificate ID:', certificateId);
+
+  // Step 2: Save to Supabase
+  const { data: sponsorship, error: dbError } = await supabase
+    .from('sponsorships')
+    .insert({
+      certificate_id: certificateId,
+      sponsor_name: sponsorName,
+      sponsor_email: sponsorEmail,
+      company: company,
+      mpa_id: mpaId,
+      mpa_name: mpaName,
+      mpa_location: mpaData.location,
+      hectares: hectares,
+      amount_paid: amount,
+      stripe_session_id: session.id,
+      stripe_payment_intent: session.payment_intent as string,
+      is_anonymous: isAnonymous,
+      status: 'active',
+      certificate_generated_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
+
+  if (dbError) {
+    console.error('Database error:', dbError);
+    throw new Error(`Failed to save sponsorship: ${dbError.message}`);
+  }
+
+  console.log('Sponsorship saved to database:', sponsorship.id);
+
+  // Step 3: Generate PDF Certificate
+  const now = new Date();
+  const validUntil = new Date(now);
+  validUntil.setFullYear(validUntil.getFullYear() + 10);
+
+  const certificatePdf = await generateCertificate({
+    certificateId,
+    sponsorName,
+    mpaName,
+    mpaLocation: mpaData.location,
+    hectares,
+    amount,
+    date: formatCertificateDate(now),
+    validUntil: formatCertificateDate(validUntil),
+  });
+
+  console.log('Certificate PDF generated, size:', certificatePdf.length, 'bytes');
+
+  // Step 4: Send email with certificate
+  const emailResult = await sendCertificateEmail(
+    sponsorEmail,
+    sponsorName,
+    mpaName,
+    mpaData.location,
+    hectares,
+    amount,
+    certificateId,
+    certificatePdf
+  );
+
+  if (emailResult.success) {
+    console.log('Certificate email sent successfully');
+
+    // Update email_sent_at timestamp
+    await supabase
+      .from('sponsorships')
+      .update({ email_sent_at: new Date().toISOString() })
+      .eq('id', sponsorship.id);
+  } else {
+    console.error('Failed to send certificate email:', emailResult.error);
+    throw new Error('Failed to send certificate email');
+  }
+
+  // Step 5: Notify admin of new sponsorship
+  await sendAdminNotification(
+    '🎉 New Sponsorship Received!',
+    `A new coral reef sponsorship has been successfully processed.`,
+    {
+      'Sponsor': isAnonymous ? 'Anonymous' : sponsorName,
+      'Email': sponsorEmail,
+      'MPA': mpaName,
+      'Hectares': hectares,
+      'Amount': `$${amount}`,
+      'Certificate ID': certificateId,
+      'Session ID': session.id,
+    }
+  );
+
+  console.log('Payment processing completed successfully for:', certificateId);
 }
