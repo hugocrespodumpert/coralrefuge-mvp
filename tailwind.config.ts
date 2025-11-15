@@ -10,20 +10,25 @@ const config: Config = {
     extend: {
       colors: {
         ocean: {
-          deep: '#0A2463',
-          blue: '#247BA0',
-          DEFAULT: '#247BA0',
+          deep: '#001F3F',
+          blue: '#0074D9',
+          bright: '#0074D9',
+          DEFAULT: '#0074D9',
         },
         turquoise: {
-          light: '#06FFA5',
-          DEFAULT: '#3BCEAC',
+          light: '#00D4AA',
+          DEFAULT: '#00D4AA',
+          reef: '#00D4AA',
         },
         coral: {
+          pink: '#FF6B6B',
           DEFAULT: '#FF6B6B',
         },
+        'text-dark': '#1A1A1A',
+        'bg-white': '#FFFFFF',
       },
       fontFamily: {
-        sans: ['var(--font-hanken-grotesk)', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.6s ease-in-out',

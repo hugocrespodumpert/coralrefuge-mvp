@@ -17,6 +17,10 @@ export async function POST(request: Request) {
     // Calculate amount
     const amount = hectares * PRICE_PER_HECTARE;
 
+    // Get base URL from environment or construct from request headers
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
+      `https://${request.headers.get('host') || 'coralrefuge.vercel.app'}`;
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -35,8 +39,8 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/sponsor?canceled=true`,
+      success_url: `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/sponsor?canceled=true`,
       customer_email: email,
       metadata: {
         name,
