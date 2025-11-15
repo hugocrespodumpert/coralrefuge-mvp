@@ -1,106 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@/components/Button';
+import { supabase } from '@/lib/supabase';
 
 interface RegistryEntry {
   id: string;
+  certificate_id: string;
   sponsorName: string;
   company?: string;
   mpaName: string;
   hectares: number;
   date: string;
-  message?: string;
   isAnonymous: boolean;
 }
 
-// Placeholder data to demonstrate the concept
-const placeholderEntries: RegistryEntry[] = [
-  {
-    id: '1',
-    sponsorName: 'Sarah Johnson',
-    company: 'Ocean Tech Solutions',
-    mpaName: 'Ras Mohammed National Park',
-    hectares: 10,
-    date: '2024-11-01',
-    message: 'Protecting our oceans for future generations. Every hectare counts!',
-    isAnonymous: false,
-  },
-  {
-    id: '2',
-    sponsorName: 'Anonymous Sponsor',
-    company: undefined,
-    mpaName: 'Giftun Islands Protected Area',
-    hectares: 25,
-    date: '2024-11-03',
-    message: undefined,
-    isAnonymous: true,
-  },
-  {
-    id: '3',
-    sponsorName: 'Michael Chen',
-    company: undefined,
-    mpaName: 'Wadi El Gemal National Park',
-    hectares: 5,
-    date: '2024-11-05',
-    message: 'Happy to contribute to this important cause!',
-    isAnonymous: false,
-  },
-  {
-    id: '4',
-    sponsorName: 'EcoGlobal Corp',
-    company: 'EcoGlobal Corp',
-    mpaName: 'Ras Mohammed National Park',
-    hectares: 50,
-    date: '2024-11-07',
-    message: 'Part of our commitment to ocean conservation and ESG goals.',
-    isAnonymous: false,
-  },
-  {
-    id: '5',
-    sponsorName: 'Emma Rodriguez',
-    company: undefined,
-    mpaName: 'Giftun Islands Protected Area',
-    hectares: 8,
-    date: '2024-11-08',
-    message: 'Growing up by the ocean, I want to ensure its beauty endures.',
-    isAnonymous: false,
-  },
-  {
-    id: '6',
-    sponsorName: 'Anonymous Sponsor',
-    company: 'Tech Innovations Inc',
-    mpaName: 'Wadi El Gemal National Park',
-    hectares: 15,
-    date: '2024-11-10',
-    message: undefined,
-    isAnonymous: true,
-  },
-  {
-    id: '7',
-    sponsorName: 'David Kim',
-    company: undefined,
-    mpaName: 'Ras Mohammed National Park',
-    hectares: 12,
-    date: '2024-11-11',
-    message: 'Coral reefs are the rainforests of the sea. Let\'s protect them!',
-    isAnonymous: false,
-  },
-  {
-    id: '8',
-    sponsorName: 'BlueWave Foundation',
-    company: 'BlueWave Foundation',
-    mpaName: 'Giftun Islands Protected Area',
-    hectares: 30,
-    date: '2024-11-12',
-    message: 'Dedicated to marine conservation worldwide.',
-    isAnonymous: false,
-  },
-];
-
 export default function RegistryPage() {
   const [filter, setFilter] = useState<string>('all');
-  const [entries] = useState<RegistryEntry[]>(placeholderEntries);
+  const [entries, setEntries] = useState<RegistryEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchSponsorships();
+  }, []);
+
+  const fetchSponsorships = async () => {
+    setIsLoading(true);
+    const { data, error } = await supabase
+      .from('sponsorships')
+      .select('id, certificate_id, sponsor_name, company, mpa_name, hectares, is_anonymous, created_at')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching sponsorships:', error);
+    } else {
+      const formattedEntries = (data || []).map((item: any) => ({
+        id: item.id,
+        certificate_id: item.certificate_id,
+        sponsorName: item.sponsor_name,
+        company: item.company,
+        mpaName: item.mpa_name,
+        hectares: item.hectares,
+        date: item.created_at,
+        isAnonymous: item.is_anonymous,
+      }));
+      setEntries(formattedEntries);
+    }
+    setIsLoading(false);
+  };
 
   const filteredEntries = filter === 'all'
     ? entries
@@ -137,7 +85,7 @@ export default function RegistryPage() {
               <div className="text-gray-700 font-semibold">Active Guardians</div>
             </div>
             <div className="text-center bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8">
-              <div className="text-5xl font-bold text-turquoise mb-2">{uniqueMPAs.length}</div>
+              <div className="text-5xl font-bold text-turquoise mb-2">{uniqueMPAs.length || 3}</div>
               <div className="text-gray-700 font-semibold">Protected Refuges</div>
             </div>
           </div>
@@ -145,71 +93,90 @@ export default function RegistryPage() {
           {/* Filter */}
           <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
             <h2 className="text-2xl font-bold text-ocean-deep">All Sponsorships</h2>
-            <div className="flex items-center gap-3">
-              <label className="text-gray-700 font-semibold">Filter by MPA:</label>
-              <select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
-              >
-                <option value="all">All MPAs</option>
-                {uniqueMPAs.map(mpa => (
-                  <option key={mpa} value={mpa}>{mpa}</option>
-                ))}
-              </select>
-            </div>
+            {uniqueMPAs.length > 0 && (
+              <div className="flex items-center gap-3">
+                <label className="text-gray-700 font-semibold">Filter by MPA:</label>
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
+                >
+                  <option value="all">All MPAs</option>
+                  {uniqueMPAs.map(mpa => (
+                    <option key={mpa} value={mpa}>{mpa}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Registry Entries */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredEntries.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-turquoise hover:shadow-lg transition-all"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-ocean-deep">
-                      {entry.isAnonymous ? 'Anonymous Sponsor' : entry.sponsorName}
-                    </h3>
-                    {entry.company && (
-                      <p className="text-sm text-gray-500">{entry.company}</p>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-turquoise">{entry.hectares}</div>
-                    <div className="text-xs text-gray-500">hectares</div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 mb-4">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <span className="text-ocean-blue">🌊</span>
-                    <span className="font-semibold">{entry.mpaName}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-500">
-                    <span>📅</span>
-                    <span>{new Date(entry.date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}</span>
-                  </div>
-                </div>
-
-                {entry.message && (
-                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-turquoise">
-                    <p className="text-gray-700 italic">&quot;{entry.message}&quot;</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {filteredEntries.length === 0 && (
+          {isLoading ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No sponsorships found for this filter.</p>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-turquoise mb-4"></div>
+              <p className="text-gray-500 text-lg">Loading sponsorships...</p>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredEntries.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="bg-white border-2 border-gray-200 rounded-2xl p-6 hover:border-turquoise hover:shadow-lg transition-all"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-ocean-deep">
+                          {entry.isAnonymous ? '🔒 Anonymous Guardian' : entry.sponsorName}
+                        </h3>
+                        {entry.company && !entry.isAnonymous && (
+                          <p className="text-sm text-gray-500">{entry.company}</p>
+                        )}
+                        <p className="text-xs text-gray-400 font-mono mt-1">
+                          {entry.certificate_id}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-turquoise">{entry.hectares}</div>
+                        <div className="text-xs text-gray-500">hectare{entry.hectares > 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-gray-700">
+                        <span className="text-ocean-blue">🌊</span>
+                        <span className="font-semibold">{entry.mpaName}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <span>📅</span>
+                        <span>{new Date(entry.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-500">
+                        <span>🪸</span>
+                        <span className="text-sm">Protecting coral reefs for 10 years</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {filteredEntries.length === 0 && !isLoading && (
+                <div className="text-center py-12">
+                  <p className="text-gray-500 text-lg mb-4">
+                    {filter === 'all'
+                      ? 'No sponsorships yet. Be the first to protect our coral reefs!'
+                      : 'No sponsorships found for this MPA.'}
+                  </p>
+                  <Button href="/sponsor">
+                    Become a Guardian
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </section>
