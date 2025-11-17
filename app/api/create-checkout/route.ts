@@ -7,8 +7,19 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, company, mpaId, mpaName, hectares, isAnonymous } = body;
 
+    console.log('📝 Checkout request received:', {
+      name,
+      email,
+      company,
+      mpaId,
+      mpaName,
+      hectares,
+      isAnonymous,
+    });
+
     // Validate required fields
     if (!name || !email || !mpaId || !mpaName || !hectares) {
+      console.error('❌ Missing required fields:', { name, email, mpaId, mpaName, hectares });
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -16,11 +27,16 @@ export async function POST(request: Request) {
     }
 
     // STEP 1: Find which partner manages this MPA
+    console.log('🔍 Looking up partner for MPA:', mpaId);
     let partnerAccount;
     try {
       partnerAccount = await getPartnerAccountForMPA(mpaId);
+      console.log('✅ Partner found:', {
+        partner: partnerAccount.partner_name,
+        stripeAccountId: partnerAccount.stripe_account_id,
+      });
     } catch (error) {
-      console.error('Partner lookup failed:', error);
+      console.error('❌ Partner lookup failed for MPA:', mpaId, error);
       return NextResponse.json(
         { error: 'This MPA is not yet available for sponsorship.' },
         { status: 500 }
@@ -46,6 +62,7 @@ export async function POST(request: Request) {
       `https://${request.headers.get('host') || 'coralrefuge.vercel.app'}`;
 
     // STEP 4: Create Stripe Checkout Session with Connect
+    console.log('💳 Creating Stripe checkout session...');
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -98,13 +115,24 @@ export async function POST(request: Request) {
       cancel_url: `${baseUrl}/sponsor?canceled=true`,
     });
 
+    console.log('✅ Stripe session created successfully:', {
+      sessionId: session.id,
+      url: session.url,
+    });
+
     return NextResponse.json({
       success: true,
       sessionId: session.id,
       url: session.url,
     });
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    console.error('❌ STRIPE CHECKOUT ERROR:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+      });
+    }
     const errorMessage = error instanceof Error ? error.message : 'Failed to create checkout session';
     return NextResponse.json(
       { error: errorMessage },

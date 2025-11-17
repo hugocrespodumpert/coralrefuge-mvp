@@ -63,12 +63,17 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
-    console.log('Payment completed for session:', session.id);
+    console.log('✅ Payment completed for session:', session.id);
+    console.log('📦 Session metadata:', session.metadata);
 
     try {
       await handleSuccessfulPayment(session);
+      console.log('✅ Payment processing completed successfully');
     } catch (error) {
-      console.error('Error processing successful payment:', error);
+      console.error('❌ ERROR processing successful payment:', error);
+      if (error instanceof Error) {
+        console.error('Error stack:', error.stack);
+      }
 
       // Send admin notification about the error
       await sendAdminNotification(
@@ -121,6 +126,8 @@ export async function POST(req: Request) {
  * 5. Notify admin
  */
 async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
+  console.log('🔄 Starting payment processing...');
+
   // Extract metadata from the session
   const metadata = session.metadata!;
   const sponsorName = metadata.name;
@@ -138,7 +145,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const platformFee = parseInt(metadata.platform_fee);
   const partnerAmount = parseInt(metadata.partner_amount);
 
-  console.log('Processing payment for:', {
+  console.log('📋 Processing payment for:', {
     sponsorName,
     sponsorEmail,
     mpaName,
@@ -155,42 +162,27 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     coordinates: 'Unknown',
   };
 
-  // Step 1: Generate unique certificate ID
-  // First, get the count of existing sponsorships for this MPA this year
-  const currentYear = new Date().getFullYear();
-  const { count } = await supabase
-    .from('sponsorships')
-    .select('*', { count: 'exact', head: true })
-    .eq('mpa_id', mpaId)
-    .gte('created_at', `${currentYear}-01-01`)
-    .lte('created_at', `${currentYear}-12-31`);
+  console.log('💾 Saving sponsorship to database...');
 
-  const sequenceNumber = (count || 0) + 1;
-  const mpaPrefix = mpaId.replace('-', '').substring(0, 3).toUpperCase();
-  const certificateId = `${mpaPrefix}-${currentYear}-${sequenceNumber.toString().padStart(5, '0')}`;
-
-  console.log('Generated certificate ID:', certificateId);
-
-  // Step 2: Save to Supabase with Stripe Connect data
+  // Save to Supabase with Stripe Connect data
   const { data: sponsorship, error: dbError } = await supabase
     .from('sponsorships')
     .insert({
-      certificate_id: certificateId,
-      sponsor_name: sponsorName,
-      sponsor_email: sponsorEmail,
+      stripe_session_id: session.id,
+      stripe_payment_intent: session.payment_intent as string,
+      name: sponsorName,
+      email: sponsorEmail,
       company: company,
       mpa_id: mpaId,
       mpa_name: mpaName,
-      mpa_location: mpaData.location,
       hectares: hectares,
-      amount_paid: amount,
-      stripe_session_id: session.id,
-      stripe_payment_intent: session.payment_intent as string,
+      amount: amount,
       is_anonymous: isAnonymous,
-      status: 'active',
-      certificate_generated_at: new Date().toISOString(),
+      payment_status: 'completed',
+      certificate_status: 'generated',
+      certificate_url: null,
 
-      // 🔑 NEW: Stripe Connect fields
+      // 🔑 Stripe Connect fields
       connected_account_id: partnerAccountId,
       platform_fee_amount: platformFee,
       partner_amount: partnerAmount,
@@ -200,13 +192,24 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     .single();
 
   if (dbError) {
-    console.error('Database error:', dbError);
+    console.error('❌ DATABASE ERROR:', dbError);
+    console.error('Error details:', {
+      message: dbError.message,
+      code: dbError.code,
+      details: dbError.details,
+      hint: dbError.hint,
+    });
     throw new Error(`Failed to save sponsorship: ${dbError.message}`);
   }
 
-  console.log('Sponsorship saved to database:', sponsorship.id);
+  console.log('✅ Sponsorship saved to database:', sponsorship.id);
+
+  // Generate certificate ID from sponsorship ID
+  const certificateId = `CR-${mpaId.toUpperCase().substring(0, 3)}-${sponsorship.id.substring(0, 8).toUpperCase()}`;
+  console.log('📜 Generated certificate ID:', certificateId);
 
   // Step 3: Generate PDF Certificate
+  console.log('📄 Generating PDF certificate...');
   const now = new Date();
   const validUntil = new Date(now);
   validUntil.setFullYear(validUntil.getFullYear() + 10);
@@ -222,9 +225,10 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     validUntil: formatCertificateDate(validUntil),
   });
 
-  console.log('Certificate PDF generated, size:', certificatePdf.length, 'bytes');
+  console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
 
   // Step 4: Send email with certificate
+  console.log('📧 Sending certificate email...');
   const emailResult = await sendCertificateEmail(
     sponsorEmail,
     sponsorName,
@@ -237,19 +241,20 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   );
 
   if (emailResult.success) {
-    console.log('Certificate email sent successfully');
+    console.log('✅ Certificate email sent successfully');
 
-    // Update email_sent_at timestamp
+    // Update certificate status to 'sent'
     await supabase
       .from('sponsorships')
-      .update({ email_sent_at: new Date().toISOString() })
+      .update({ certificate_status: 'sent' })
       .eq('id', sponsorship.id);
   } else {
-    console.error('Failed to send certificate email:', emailResult.error);
+    console.error('❌ Failed to send certificate email:', emailResult.error);
     throw new Error('Failed to send certificate email');
   }
 
   // Step 5: Notify admin of new sponsorship
+  console.log('📬 Sending admin notification...');
   await sendAdminNotification(
     '🎉 New Sponsorship Received!',
     `A new coral reef sponsorship has been successfully processed.`,
@@ -267,5 +272,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     }
   );
 
-  console.log('Payment processing completed successfully for:', certificateId);
+  console.log('🎉 Payment processing completed successfully!');
+  console.log('Certificate ID:', certificateId);
+  console.log('Sponsorship ID:', sponsorship.id);
 }
