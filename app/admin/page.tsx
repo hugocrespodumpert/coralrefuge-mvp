@@ -19,6 +19,11 @@ interface Sponsorship {
   status: string;
   email_sent_at?: string;
   created_at: string;
+  // 🔑 NEW: Stripe Connect fields
+  connected_account_id?: string;
+  platform_fee_amount?: number;
+  partner_amount?: number;
+  partner_name?: string;
 }
 
 interface WaitlistEntry {
@@ -194,7 +199,7 @@ export default function AdminPage() {
           </Button>
         </div>
 
-        {/* Stats */}
+        {/* Stats - General */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="text-3xl font-bold text-turquoise mb-2">
@@ -219,6 +224,33 @@ export default function AdminPage() {
               {waitlistEntries.length}
             </div>
             <div className="text-gray-600">Waitlist Signups</div>
+          </div>
+        </div>
+
+        {/* 🔑 NEW: Revenue Breakdown Cards (Stripe Connect) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 shadow-lg text-white">
+            <h3 className="text-sm font-medium mb-2 text-purple-100">Total Revenue</h3>
+            <p className="text-4xl font-bold mb-3">
+              ${(sponsorships.reduce((sum, s) => sum + s.amount_paid, 0) / 100).toFixed(2)}
+            </p>
+            <p className="text-purple-100 text-sm">All-time platform volume</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 shadow-lg text-white">
+            <h3 className="text-sm font-medium mb-2 text-blue-100">Platform Fees (15%)</h3>
+            <p className="text-4xl font-bold mb-3">
+              ${(sponsorships.reduce((sum, s) => sum + (s.platform_fee_amount || 0), 0) / 100).toFixed(2)}
+            </p>
+            <p className="text-blue-100 text-sm">Coral Refuge revenue</p>
+          </div>
+
+          <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 shadow-lg text-white">
+            <h3 className="text-sm font-medium mb-2 text-green-100">To Partners (85%)</h3>
+            <p className="text-4xl font-bold mb-3">
+              ${(sponsorships.reduce((sum, s) => sum + (s.partner_amount || 0), 0) / 100).toFixed(2)}
+            </p>
+            <p className="text-green-100 text-sm">Partners received</p>
           </div>
         </div>
 
@@ -272,12 +304,14 @@ export default function AdminPage() {
                         <tr className="border-b-2 border-gray-200">
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">Certificate ID</th>
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">Sponsor</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">MPA</th>
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">Hectares</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Amount</th>
-                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Total</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Partner</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Platform Fee</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Partner Amount</th>
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                          <th className="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
                           <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
                         </tr>
                       </thead>
@@ -288,12 +322,17 @@ export default function AdminPage() {
                             <td className="py-3 px-4">
                               {sponsorship.is_anonymous ? '🔒 Anonymous' : sponsorship.sponsor_name}
                             </td>
-                            <td className="py-3 px-4 text-sm">{sponsorship.sponsor_email}</td>
                             <td className="py-3 px-4 text-sm">{sponsorship.mpa_name}</td>
                             <td className="py-3 px-4">{sponsorship.hectares}</td>
-                            <td className="py-3 px-4">${sponsorship.amount_paid}</td>
-                            <td className="py-3 px-4 text-sm">
-                              {new Date(sponsorship.created_at).toLocaleDateString()}
+                            <td className="py-3 px-4">${(sponsorship.amount_paid / 100).toFixed(2)}</td>
+                            <td className="py-3 px-4 text-blue-600 font-medium text-sm">
+                              {sponsorship.partner_name || 'N/A'}
+                            </td>
+                            <td className="py-3 px-4 text-purple-600 font-medium text-sm">
+                              ${((sponsorship.platform_fee_amount || 0) / 100).toFixed(2)}
+                            </td>
+                            <td className="py-3 px-4 text-green-600 font-medium text-sm">
+                              ${((sponsorship.partner_amount || 0) / 100).toFixed(2)}
                             </td>
                             <td className="py-3 px-4">
                               {sponsorship.email_sent_at ? (
@@ -301,6 +340,9 @@ export default function AdminPage() {
                               ) : (
                                 <span className="text-yellow-600 text-sm">⚠ Pending</span>
                               )}
+                            </td>
+                            <td className="py-3 px-4 text-sm">
+                              {new Date(sponsorship.created_at).toLocaleDateString()}
                             </td>
                             <td className="py-3 px-4">
                               <button

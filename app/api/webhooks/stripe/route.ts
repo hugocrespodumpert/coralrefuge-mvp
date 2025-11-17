@@ -89,6 +89,26 @@ export async function POST(req: Request) {
     }
   }
 
+  // 🔑 NEW: Log platform fee collection
+  if (event.type === 'application_fee.created') {
+    const fee = event.data.object as Stripe.ApplicationFee;
+    console.log('💰 Platform fee collected:', {
+      amount: `$${fee.amount / 100}`,
+      account: fee.account,
+      feeId: fee.id,
+    });
+  }
+
+  // 🔑 NEW: Log transfer to partner
+  if (event.type === 'transfer.created') {
+    const transfer = event.data.object as Stripe.Transfer;
+    console.log('💸 Transfer to partner:', {
+      amount: `$${transfer.amount / 100}`,
+      destination: transfer.destination,
+      transferId: transfer.id,
+    });
+  }
+
   return NextResponse.json({ received: true });
 }
 
@@ -112,12 +132,21 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const amount = parseInt(metadata.amount);
   const isAnonymous = metadata.isAnonymous === 'true';
 
+  // 🔑 NEW: Stripe Connect data
+  const partnerName = metadata.partner_name;
+  const partnerAccountId = metadata.partner_account_id;
+  const platformFee = parseInt(metadata.platform_fee);
+  const partnerAmount = parseInt(metadata.partner_amount);
+
   console.log('Processing payment for:', {
     sponsorName,
     sponsorEmail,
     mpaName,
     hectares,
     amount,
+    partner: partnerName,
+    platformFee: `$${platformFee / 100}`,
+    partnerAmount: `$${partnerAmount / 100}`,
   });
 
   // Get MPA location data
@@ -142,7 +171,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   console.log('Generated certificate ID:', certificateId);
 
-  // Step 2: Save to Supabase
+  // Step 2: Save to Supabase with Stripe Connect data
   const { data: sponsorship, error: dbError } = await supabase
     .from('sponsorships')
     .insert({
@@ -160,6 +189,12 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       is_anonymous: isAnonymous,
       status: 'active',
       certificate_generated_at: new Date().toISOString(),
+
+      // 🔑 NEW: Stripe Connect fields
+      connected_account_id: partnerAccountId,
+      platform_fee_amount: platformFee,
+      partner_amount: partnerAmount,
+      partner_name: partnerName,
     })
     .select()
     .single();
@@ -222,8 +257,11 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       'Sponsor': isAnonymous ? 'Anonymous' : sponsorName,
       'Email': sponsorEmail,
       'MPA': mpaName,
+      'Partner': partnerName,
       'Hectares': hectares,
       'Amount': `$${amount}`,
+      'Platform Fee (15%)': `$${(platformFee / 100).toFixed(2)}`,
+      'Partner Receives (85%)': `$${(partnerAmount / 100).toFixed(2)}`,
       'Certificate ID': certificateId,
       'Session ID': session.id,
     }
