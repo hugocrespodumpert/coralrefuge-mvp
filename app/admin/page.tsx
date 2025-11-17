@@ -6,20 +6,22 @@ import { supabase } from '@/lib/supabase';
 
 interface Sponsorship {
   id: string;
-  certificate_id: string;
-  sponsor_name: string;
-  sponsor_email: string;
+  stripe_session_id: string;
+  stripe_payment_intent?: string;
+  name: string;
+  email: string;
   company?: string;
   mpa_id: string;
   mpa_name: string;
-  mpa_location: string;
   hectares: number;
-  amount_paid: number;
+  amount: number;
   is_anonymous: boolean;
-  status: string;
-  email_sent_at?: string;
+  payment_status: string;
+  certificate_status: string;
+  certificate_url?: string;
   created_at: string;
-  // 🔑 NEW: Stripe Connect fields
+  updated_at?: string;
+  // 🔑 Stripe Connect fields
   connected_account_id?: string;
   platform_fee_amount?: number;
   partner_amount?: number;
@@ -124,7 +126,7 @@ export default function AdminPage() {
   };
 
   const handleResendCertificate = async (sponsorship: Sponsorship) => {
-    if (!confirm(`Resend certificate to ${sponsorship.sponsor_email}?`)) return;
+    if (!confirm(`Resend certificate to ${sponsorship.email}?`)) return;
 
     setIsResending(sponsorship.id);
     try {
@@ -215,7 +217,7 @@ export default function AdminPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="text-3xl font-bold text-turquoise mb-2">
-              ${sponsorships.reduce((sum, s) => sum + s.amount_paid, 0).toLocaleString()}
+              ${sponsorships.reduce((sum, s) => sum + s.amount, 0).toLocaleString()}
             </div>
             <div className="text-gray-600">Total Revenue</div>
           </div>
@@ -232,7 +234,7 @@ export default function AdminPage() {
           <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 shadow-lg text-white">
             <h3 className="text-sm font-medium mb-2 text-purple-100">Total Revenue</h3>
             <p className="text-4xl font-bold mb-3">
-              ${(sponsorships.reduce((sum, s) => sum + s.amount_paid, 0) / 100).toFixed(2)}
+              ${sponsorships.reduce((sum, s) => sum + s.amount, 0).toLocaleString()}
             </p>
             <p className="text-purple-100 text-sm">All-time platform volume</p>
           </div>
@@ -318,13 +320,13 @@ export default function AdminPage() {
                       <tbody>
                         {sponsorships.map((sponsorship) => (
                           <tr key={sponsorship.id} className="border-b border-gray-100 hover:bg-gray-50">
-                            <td className="py-3 px-4 font-mono text-sm">{sponsorship.certificate_id}</td>
+                            <td className="py-3 px-4 font-mono text-sm">{sponsorship.stripe_session_id.substring(0, 20)}...</td>
                             <td className="py-3 px-4">
-                              {sponsorship.is_anonymous ? '🔒 Anonymous' : sponsorship.sponsor_name}
+                              {sponsorship.is_anonymous ? '🔒 Anonymous' : sponsorship.name}
                             </td>
                             <td className="py-3 px-4 text-sm">{sponsorship.mpa_name}</td>
                             <td className="py-3 px-4">{sponsorship.hectares}</td>
-                            <td className="py-3 px-4">${(sponsorship.amount_paid / 100).toFixed(2)}</td>
+                            <td className="py-3 px-4">${sponsorship.amount}</td>
                             <td className="py-3 px-4 text-blue-600 font-medium text-sm">
                               {sponsorship.partner_name || 'N/A'}
                             </td>
