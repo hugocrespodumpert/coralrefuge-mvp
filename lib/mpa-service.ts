@@ -30,16 +30,42 @@ export interface EnhancedMPAMetadata {
 
 /**
  * Enhanced MPA data using manual placeholder boundaries
+ * Includes all properties from MPAProperties plus metadata
  */
 export interface EnhancedMPA {
   id: string;
   slug: string;
   name: string;
+  nameArabic: string;
+  location: string;
+  coordinates: [number, number];
   hectares: number;
+  marineSqKm: number;
   designation: string;
+  designationArabic: string;
+  iucnCategory: string;
+  iucnCategoryDescription: string;
   partner: string;
+  partnerFullName: string;
+  governance: string;
+  established: number;
+  legalStatus: string;
   description: string;
+  descriptionLong: string;
+  highlights: string[];
+  biodiversity: {
+    coralSpecies: number;
+    fishSpecies?: number;
+    endangeredSpecies?: string[];
+  };
+  conservation: {
+    refugiumType: string;
+    climateThreat: string;
+    protectionLevel: string;
+  };
   pricePerHectare: number;
+  imageUrl: string;
+  dataSources: string[];
   geometry: {
     type: string;
     coordinates: number[][][] | number[][][][]; // Support both Polygon and MultiPolygon
