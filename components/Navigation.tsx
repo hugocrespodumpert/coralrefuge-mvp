@@ -33,10 +33,10 @@ export default function Navigation() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-turquoise rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-teal rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xl">🪸</span>
             </div>
-            <span className={`font-bold text-xl ${isScrolled ? 'text-ocean-deep' : 'text-white'}`}>
+            <span className={`font-bold text-xl ${isScrolled ? 'text-navy-deep' : 'text-white'}`}>
               Coral Refuge
             </span>
           </Link>
@@ -49,7 +49,7 @@ export default function Navigation() {
                 href={link.href}
                 className={`font-medium transition-colors ${
                   isScrolled
-                    ? 'text-gray-700 hover:text-ocean-blue'
+                    ? 'text-gray-700 hover:text-teal'
                     : 'text-white/90 hover:text-white'
                 }`}
               >
@@ -65,7 +65,7 @@ export default function Navigation() {
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className={`md:hidden p-2 rounded-lg ${
-              isScrolled ? 'text-ocean-deep' : 'text-white'
+              isScrolled ? 'text-navy-deep' : 'text-white'
             }`}
           >
             <svg

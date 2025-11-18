@@ -261,7 +261,7 @@ export default function Map() {
 
         // Check if error is related to coral tiles
         // Mapbox error events may include sourceId in the error object
-        const errorObj = e.error as any;
+        const errorObj = e.error as { sourceId?: string };
         if (errorObj && (errorObj.sourceId === 'coral-atlas' || e.toString().includes('coral-atlas'))) {
           console.error('❌ Coral Atlas tiles failed to load:', e);
           setCoralError('Coral data temporarily unavailable');
