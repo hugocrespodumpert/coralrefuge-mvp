@@ -1,8 +1,56 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Button from '@/components/Button';
 import WaveDivider from '@/components/WaveDivider';
+import WaitlistBanner from '@/components/WaitlistBanner';
+import WaitlistModal from '@/components/WaitlistModal';
 
 export default function Home() {
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
+  const [hasSeenModal, setHasSeenModal] = useState(false);
+
+  // Auto-trigger modal after 30 seconds or 50% scroll
+  useEffect(() => {
+    // Check if user has already seen the modal in this session
+    if (hasSeenModal) return;
+
+    let hasScrolledEnough = false;
+    let timeoutId: NodeJS.Timeout;
+
+    // Timer trigger (30 seconds)
+    timeoutId = setTimeout(() => {
+      if (!hasSeenModal) {
+        setIsWaitlistModalOpen(true);
+        setHasSeenModal(true);
+      }
+    }, 30000);
+
+    // Scroll trigger (50%)
+    const handleScroll = () => {
+      const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      if (scrollPercent >= 50 && !hasScrolledEnough && !hasSeenModal) {
+        hasScrolledEnough = true;
+        setIsWaitlistModalOpen(true);
+        setHasSeenModal(true);
+        clearTimeout(timeoutId);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      clearTimeout(timeoutId);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasSeenModal]);
+
+  const handleOpenWaitlist = () => {
+    setIsWaitlistModalOpen(true);
+    setHasSeenModal(true);
+  };
+
   return (
     <main className="min-h-screen">
       {/* Hero Section - Premium Full-Screen Immersive */}
@@ -33,9 +81,12 @@ export default function Home() {
           </p>
 
           {/* Premium CTA */}
-          <Button href="/sponsor" size="lg" className="animate-slide-in-bottom">
-            Choose Your Refuge →
-          </Button>
+          <button
+            onClick={handleOpenWaitlist}
+            className="bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-4 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl animate-slide-in-bottom text-lg"
+          >
+            Join Waitlist →
+          </button>
 
           {/* Scroll indicator */}
           <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce-slow">
@@ -44,6 +95,55 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
             </svg>
           </div>
+        </div>
+      </section>
+
+      {/* Science Partners Logo Section */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-sm uppercase tracking-wide text-gray-500 mb-6">
+            Built on science from
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="flex flex-col items-center">
+              <div className="h-20 w-full flex items-center justify-center mb-3">
+                <div className="text-gray-400 text-sm font-semibold px-6 py-3 border-2 border-gray-300 rounded-lg opacity-60 hover:opacity-100 transition-opacity">
+                  ALLEN CORAL ATLAS
+                </div>
+              </div>
+              <p className="text-xs text-gray-600">Satellite reef mapping data</p>
+              <a
+                href="https://allencoralatlas.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline mt-1"
+              >
+                allencoralatlas.org →
+              </a>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="h-20 w-full flex items-center justify-center mb-3">
+                <div className="text-gray-400 text-sm font-semibold px-6 py-3 border-2 border-gray-300 rounded-lg opacity-60 hover:opacity-100 transition-opacity">
+                  50 REEFS INITIATIVE
+                </div>
+              </div>
+              <p className="text-xs text-gray-600">Climate refugia site selection</p>
+              <a
+                href="https://www.50reefs.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:underline mt-1"
+              >
+                50reefs.org →
+              </a>
+            </div>
+          </div>
+
+          <p className="text-xs text-gray-400 mt-6">
+            Attribution only - not formal partnerships
+          </p>
         </div>
       </section>
 
@@ -259,9 +359,12 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-16">
-            <Button href="/sponsor" size="lg">
-              Start Your Journey →
-            </Button>
+            <button
+              onClick={handleOpenWaitlist}
+              className="bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-4 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+            >
+              Join Waitlist →
+            </button>
           </div>
         </div>
       </section>
@@ -316,9 +419,12 @@ export default function Home() {
                     <p className="text-xs text-white/70 mt-1">2,200 Ha available</p>
                   </div>
 
-                  <Button href="/sponsor" variant="primary" className="w-full group-hover:scale-105 transition-transform">
-                    Sponsor This Refuge →
-                  </Button>
+                  <button
+                    onClick={handleOpenWaitlist}
+                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
+                  >
+                    Join Waitlist →
+                  </button>
                 </div>
 
                 <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
@@ -364,9 +470,12 @@ export default function Home() {
                     <p className="text-xs text-white/70 mt-1">6,400 Ha available</p>
                   </div>
 
-                  <Button href="/sponsor" variant="primary" className="w-full group-hover:scale-105 transition-transform">
-                    Sponsor This Refuge →
-                  </Button>
+                  <button
+                    onClick={handleOpenWaitlist}
+                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
+                  >
+                    Join Waitlist →
+                  </button>
                 </div>
 
                 <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
@@ -412,9 +521,12 @@ export default function Home() {
                     <p className="text-xs text-white/70 mt-1">7,200 Ha available</p>
                   </div>
 
-                  <Button href="/sponsor" variant="primary" className="w-full group-hover:scale-105 transition-transform">
-                    Sponsor This Refuge →
-                  </Button>
+                  <button
+                    onClick={handleOpenWaitlist}
+                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
+                  >
+                    Join Waitlist →
+                  </button>
                 </div>
 
                 <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
@@ -501,9 +613,12 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button href="/sponsor" size="lg" className="min-w-[240px]">
-              Protect Reefs Now →
-            </Button>
+            <button
+              onClick={handleOpenWaitlist}
+              className="min-w-[240px] bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-4 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+            >
+              Join Waitlist →
+            </button>
             <Button href="/map" variant="outline" size="lg" className="min-w-[240px]">
               Explore the Map
             </Button>
@@ -514,6 +629,15 @@ export default function Home() {
           </p>
         </div>
       </section>
+
+      {/* Waitlist Banner */}
+      <WaitlistBanner onJoinClick={handleOpenWaitlist} />
+
+      {/* Waitlist Modal */}
+      <WaitlistModal
+        isOpen={isWaitlistModalOpen}
+        onClose={() => setIsWaitlistModalOpen(false)}
+      />
     </main>
   );
 }
