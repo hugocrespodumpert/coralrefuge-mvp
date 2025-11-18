@@ -93,7 +93,7 @@ export default function RegistryPage() {
             </div>
             <div className="text-center bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8">
               <div className="text-5xl font-bold text-turquoise mb-2">{totalSponsors}</div>
-              <div className="text-gray-700 font-semibold">Active Guardians</div>
+              <div className="text-gray-700 font-semibold">Active Sponsors</div>
             </div>
             <div className="text-center bg-gradient-to-br from-turquoise/10 to-ocean-blue/10 rounded-2xl p-8">
               <div className="text-5xl font-bold text-turquoise mb-2">{uniqueMPAs.length || 3}</div>
@@ -138,7 +138,7 @@ export default function RegistryPage() {
                     <div className="flex items-start justify-between mb-4">
                       <div>
                         <h3 className="text-xl font-bold text-ocean-deep">
-                          {entry.isAnonymous ? '🔒 Anonymous Guardian' : entry.sponsorName}
+                          {entry.isAnonymous ? '🔒 Anonymous Sponsor' : entry.sponsorName}
                         </h3>
                         {entry.company && !entry.isAnonymous && (
                           <p className="text-sm text-gray-500">{entry.company}</p>
@@ -183,7 +183,7 @@ export default function RegistryPage() {
                       : 'No sponsorships found for this MPA.'}
                   </p>
                   <Button href="/sponsor">
-                    Become a Guardian
+                    Become a Sponsor
                   </Button>
                 </div>
               )}

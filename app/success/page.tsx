@@ -39,7 +39,7 @@ function SuccessContent() {
             </svg>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-ocean-deep mb-4">
-            🎉 Thank You, Guardian!
+            🎉 Thank You, Sponsor!
           </h1>
           <p className="text-xl text-gray-600">
             Your payment was successful. You&apos;re now officially protecting coral reefs!
@@ -73,7 +73,7 @@ function SuccessContent() {
               <div>
                 <h3 className="font-semibold text-ocean-deep mb-1">Certificate Generation</h3>
                 <p className="text-gray-600">
-                  Your official Guardian Certificate will be generated and emailed to you within 24 hours.
+                  Your official Sponsor Certificate will be generated and emailed to you within 24 hours.
                   It will include your unique certificate ID and a QR code linking to your registry entry.
                 </p>
               </div>
@@ -165,7 +165,7 @@ function SuccessContent() {
           <div className="flex justify-center gap-4">
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                "I just became a Guardian of Coral Refuges! 🪸🌊 Protecting climate-resilient coral reefs one hectare at a time. Join me at coralrefuge.org"
+                "I just became a Sponsor of Coral Refuges! 🪸🌊 Protecting climate-resilient coral reefs one hectare at a time. Join me at coralrefuge.org"
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -196,7 +196,7 @@ function SuccessContent() {
             Built with science. Driven by purpose.
           </p>
           <p className="text-gray-500 mt-2">
-            Thank you for being a guardian of the ocean&apos;s last hope. 🌊🪸
+            Thank you for being a sponsor of the ocean&apos;s last hope. 🌊🪸
           </p>
         </div>
       </div>

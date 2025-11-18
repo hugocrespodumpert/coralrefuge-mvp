@@ -20,124 +20,169 @@ export default function Home() {
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-6xl md:text-8xl font-bold text-white mb-8 leading-tight tracking-tight">
-            Protect the coral reefs<br />that can survive<br /><span className="text-turquoise">climate change</span>
+          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
+            Some coral reefs can survive.
           </h1>
-          <p className="text-2xl md:text-3xl text-white/95 mb-12 max-w-4xl mx-auto font-semibold">
-            Sponsor marine protected areas in Egypt&apos;s Red Sea and become a guardian of coral refugia.
+          <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Science identified them. We&apos;re protecting them.
           </p>
-          <Button href="/sponsor" size="lg" className="bg-coral text-white hover:bg-coral/90 text-xl px-12 py-6 rounded-full font-bold shadow-2xl">
-            Protect a Reef
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <Button href="/sponsor" size="lg" className="bg-white text-blue-600 hover:bg-blue-50 text-lg px-8 py-4 rounded-lg font-bold shadow-xl">
+              Protect Coral Reefs
+            </Button>
+            <Button href="/map" size="lg" className="bg-blue-600/50 backdrop-blur text-white border border-white/30 hover:bg-blue-600/70 text-lg px-8 py-4 rounded-lg font-bold">
+              Explore Map
+            </Button>
+          </div>
         </div>
 
         <WaveDivider className="absolute bottom-0" color="#ffffff" />
       </section>
 
       {/* The Crisis */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-6xl md:text-7xl font-bold text-ocean-deep mb-6">
-              Half the world&apos;s corals are gone
-            </h2>
-            <p className="text-3xl md:text-4xl text-coral font-bold">
-              90% could die by 2050
-            </p>
+      <section className="py-20 bg-gray-900 text-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-12 text-center">
+            We are losing them
+          </h2>
+
+          <div className="grid md:grid-cols-2 gap-12 mb-12">
+            <div className="text-center">
+              <div className="text-6xl font-bold text-red-400 mb-2">50%</div>
+              <p className="text-xl text-gray-300">
+                of coral reefs have vanished since 1950
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="text-6xl font-bold text-red-400 mb-2">90%</div>
+              <p className="text-xl text-gray-300">
+                of what remains could die by 2050
+              </p>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="https://images.unsplash.com/photo-1546500840-ae38253aba9b?w=800&q=80"
-                alt="Healthy coral reef"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                <p className="text-white text-xl font-bold">Healthy Reef</p>
-              </div>
-            </div>
-            <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80"
-                alt="Bleached coral"
-                fill
-                className="object-cover grayscale"
-              />
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
-                <p className="text-white text-xl font-bold">Bleached Coral</p>
-              </div>
-            </div>
-          </div>
+          <p className="text-2xl text-center text-blue-200">
+            But some reefs are different.
+          </p>
         </div>
       </section>
 
-      {/* The Solution */}
-      <section className="py-24 bg-gradient-to-br from-ocean-deep to-ocean-blue text-white">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-5xl md:text-6xl font-bold mb-8">
-            Climate refugia: Reefs that can survive
+      {/* The Solution - Nature's Survivors */}
+      <section className="py-20 bg-gradient-to-b from-blue-50 to-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-center text-ocean-deep">
+            Nature&apos;s survivors
           </h2>
-          <p className="text-2xl md:text-3xl leading-relaxed mb-12">
-            These rare reefs have unique conditions that help them weather warming seas.
-            By protecting them, we preserve biodiversity and give coral a fighting chance.
+          <p className="text-xl text-gray-600 text-center mb-12">
+            Our ocean&apos;s last hope.
           </p>
-          <div className="relative h-96 rounded-2xl overflow-hidden shadow-2xl max-w-4xl mx-auto">
-            <Image
-              src="https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=1200&q=80"
-              alt="Map showing refugia locations"
-              fill
-              className="object-cover"
-            />
+
+          <div className="prose prose-lg max-w-none">
+            <p className="text-lg leading-relaxed mb-6 text-gray-700">
+              Climate refugia are places where <strong>millions of years of evolution</strong> created natural advantages. Deep channels pump cool water to the surface. Strong currents regulate temperature. Coral genetics evolved for resilience.
+            </p>
+
+            <div className="bg-blue-50 rounded-xl p-6 my-8">
+              <ul className="space-y-3 text-lg list-none">
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-xl flex-shrink-0">✓</span>
+                  <span className="text-gray-700">They recover <strong>40% faster</strong> than unprotected reefs</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-xl flex-shrink-0">✓</span>
+                  <span className="text-gray-700">They harbor genetic diversity crucial for adaptation</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-green-500 text-xl flex-shrink-0">✓</span>
+                  <span className="text-gray-700">They are the seed banks for tomorrow&apos;s oceans</span>
+                </li>
+              </ul>
+            </div>
+
+            <p className="text-lg leading-relaxed text-gray-700">
+              But only if we defend them from overfishing, pollution, and coastal development <strong>today.</strong>
+            </p>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-5xl md:text-6xl font-bold text-ocean-deep text-center mb-20">
-            How It Works
+      <section className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center text-ocean-deep">
+            Three steps. Real impact.
+          </h2>
+          <p className="text-xl text-gray-600 text-center mb-16">
+            Launching June 2026
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="text-5xl mb-4">🗺️</div>
+              <h3 className="text-2xl font-bold mb-3 text-ocean-deep">Pick your reef</h3>
+              <p className="text-gray-600">
+                Explore our map of verified coral refuges
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="text-5xl mb-4">💰</div>
+              <h3 className="text-2xl font-bold mb-3 text-ocean-deep">Fund protection</h3>
+              <p className="text-gray-600">
+                <strong>80%</strong> goes directly to verified conservation partners
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="text-5xl mb-4">📊</div>
+              <h3 className="text-2xl font-bold mb-3 text-ocean-deep">Watch it thrive</h3>
+              <p className="text-gray-600">
+                Track impact from your sponsored site
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button href="/sponsor" size="lg" className="bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition">
+              Sponsor a Reef
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Approach */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl font-bold mb-16 text-center text-ocean-deep">
+            Built on science. Driven by transparency.
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-24 h-24 bg-turquoise rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-ocean-deep mb-4">Select Your Refuge</h3>
-              <p className="text-xl text-gray-600">
-                Choose from verified climate-resilient MPAs in Egypt&apos;s Red Sea
+          <div className="grid md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-ocean-deep">Science-backed site selection</h3>
+              <p className="text-gray-600">
+                Every refuge meets criteria from the <strong>50 Reefs Initiative</strong> and is validated through <strong>Allen Coral Atlas</strong> satellite mapping.
               </p>
             </div>
 
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-24 h-24 bg-turquoise rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-ocean-deep mb-4">Protect Hectares</h3>
-              <p className="text-xl text-gray-600">
-                $50 per hectare funds monitoring, patrols, and conservation
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-ocean-deep">Local partnerships</h3>
+              <p className="text-gray-600">
+                <strong>80% of funds</strong> go directly to established organizations with decades of proven conservation success. <strong>20% funds</strong> our platform and impact reporting.
               </p>
             </div>
 
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-24 h-24 bg-turquoise rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold text-ocean-deep mb-4">Track Impact</h3>
-              <p className="text-xl text-gray-600">
-                Get your certificate and join the guardian community
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-ocean-deep">Radical transparency</h3>
+              <p className="text-gray-600">
+                GPS coordinates of your sponsored site. Annual impact reports. No vague promises. Just real reef health metrics.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-ocean-deep">Proven results</h3>
+              <p className="text-gray-600">
+                Protected refugia recover <strong>40% faster</strong> from bleaching. MPAs increase fish biomass by <strong>446%</strong>.
               </p>
             </div>
           </div>
@@ -145,7 +190,7 @@ export default function Home() {
       </section>
 
       {/* Featured Refuges */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl md:text-5xl font-bold text-ocean-deep text-center mb-16">
             Featured Coral Refuges
@@ -268,7 +313,7 @@ export default function Home() {
               <div className="text-5xl md:text-6xl font-bold text-turquoise-light mb-4">
                 0
               </div>
-              <div className="text-xl text-white/90">Active Guardians</div>
+              <div className="text-xl text-white/90">Active Sponsors</div>
             </div>
 
             <div className="text-center">

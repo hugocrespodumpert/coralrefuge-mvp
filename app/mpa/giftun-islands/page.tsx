@@ -166,7 +166,7 @@ export default function GiftunIslandsPage() {
           {/* CTA */}
           <div className="bg-gradient-to-br from-ocean-deep to-ocean-blue rounded-2xl p-12 text-center text-white shadow-2xl">
             <div className="inline-block bg-turquoise text-white px-6 py-3 rounded-full text-lg font-bold mb-6">
-              800 hectares available • $50/hectare
+              800 hectares available • $150/hectare
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Sponsor This Refuge

@@ -66,7 +66,7 @@ export default function SponsorPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const pricePerHectare = 50;
+  const pricePerHectare = 150;
   const totalPrice = hectares * pricePerHectare;
 
   // Pre-select MPA from query parameter (e.g., /sponsor?mpa=ras-mohammed)
@@ -145,7 +145,7 @@ export default function SponsorPage() {
             Choose Your Coral Refuge to Protect
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Select a marine protected area and sponsor hectares to become a guardian of climate-resilient coral reefs
+            Select a marine protected area and sponsor hectares to become a sponsor of climate-resilient coral reefs
           </p>
           {/* Test Mode Indicator */}
           <div className="mt-4 inline-block bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold">
