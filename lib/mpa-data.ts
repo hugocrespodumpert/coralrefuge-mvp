@@ -1,16 +1,21 @@
 /**
  * Marine Protected Area (MPA) Data for Coral Refuge
  *
- * Phase 1-2: Placeholder rectangular boundaries (fallback data)
- * Phase 3: Enhanced with Protected Planet API integration
+ * LICENSE COMPLIANCE NOTE:
+ * All MPA boundaries are manually-created placeholders for demonstration purposes.
+ * These are approximate rectangular boundaries based on publicly available information.
  *
- * This data serves as:
- * 1. Fallback when Protected Planet API is unavailable
- * 2. Base data structure enhanced with official WDPA data
- * 3. Mapping of local slugs to WDPA IDs
+ * Data sources:
+ * - Published scientific literature
+ * - Public domain MPA documentation
+ * - Manual coordinate approximations
  *
- * WDPA Source: World Database on Protected Areas (UNEP-WCMC)
- * https://protectedplanet.net
+ * For production deployment:
+ * - Obtain official boundaries through direct government partnerships
+ * - License commercial boundary data from authorized providers
+ * - Commission survey data with proper licensing
+ *
+ * DO NOT use Protected Planet API - their terms prohibit commercial use
  */
 
 export interface MPAFeature {
@@ -19,7 +24,6 @@ export interface MPAFeature {
     id: string;
     slug: string;
     name: string;
-    wdpaId?: number; // World Database on Protected Areas ID
     hectares: number;
     designation: string;
     partner: string;
@@ -44,7 +48,6 @@ export const mpaFeatures: MPAFeature[] = [
       id: "1",
       slug: "ras-mohammed",
       name: "Ras Mohammed National Park",
-      wdpaId: 2332, // Confirmed WDPA ID from Protected Planet
       hectares: 480,
       designation: "National Park",
       partner: "HEPCA",
@@ -69,7 +72,6 @@ export const mpaFeatures: MPAFeature[] = [
       id: "2",
       slug: "giftun-islands",
       name: "Giftun Islands",
-      wdpaId: undefined, // To be looked up via Protected Planet search
       hectares: 350,
       designation: "Marine Protected Area",
       partner: "HEPCA",
@@ -93,7 +95,6 @@ export const mpaFeatures: MPAFeature[] = [
       id: "3",
       slug: "wadi-el-gemal",
       name: "Wadi El Gemal National Park",
-      wdpaId: undefined, // To be looked up via Protected Planet search
       hectares: 5200,
       designation: "National Park",
       partner: "EEAA",

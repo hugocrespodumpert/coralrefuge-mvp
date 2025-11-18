@@ -49,7 +49,7 @@ export default function MapPage() {
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200">
-          Phase 3: Official boundaries via Protected Planet API when available
+          Using approximate placeholder boundaries for demonstration
         </p>
       </div>
     </main>

@@ -153,23 +153,20 @@ export default function Map() {
             const properties = feature.properties;
 
             if (properties) {
-              // Show enhanced tooltip with metadata
+              // Show tooltip with MPA information
               if (popup.current && e.lngLat) {
                 const htmlContent = `
                   <div class="font-sans max-w-xs">
                     <h3 class="font-bold text-base mb-2">${properties.name}</h3>
                     <div class="space-y-1 text-sm text-gray-700">
                       <div>📏 ${Number(properties.hectares).toLocaleString()} hectares</div>
-                      ${properties.iucnCategory ? `<div>📋 IUCN Category ${properties.iucnCategory}</div>` : ''}
                       <div>🏛️ ${properties.designation}</div>
                       <div>🛡️ Managed by ${properties.partner}</div>
                     </div>
                     <div class="mt-2 pt-2 border-t border-gray-200">
                       <span class="text-blue-600 font-medium text-sm">✨ Available to Sponsor</span>
                     </div>
-                    ${properties.dataSource === 'protected_planet'
-                      ? '<div class="text-xs text-green-600 mt-2">✓ Official WDPA data</div>'
-                      : '<div class="text-xs text-amber-600 mt-2">⚠ Placeholder boundary</div>'}
+                    <div class="text-xs text-gray-500 mt-2">ℹ️ Approximate boundary</div>
                   </div>
                 `;
 
@@ -215,22 +212,14 @@ export default function Map() {
             if (properties) {
               console.log('MPA clicked:', properties);
 
-              // Enhanced alert with metadata (will be replaced with modal in Phase 4)
+              // Simple alert (will be replaced with modal in Phase 4)
               let message = `${properties.name}\n\n`;
               message += `Size: ${Number(properties.hectares).toLocaleString()} hectares\n`;
               message += `Designation: ${properties.designation}\n`;
-              if (properties.iucnCategory) {
-                message += `IUCN Category: ${properties.iucnCategory}\n`;
-              }
               message += `Managed by: ${properties.partner}\n`;
-              if (properties.wdpaId) {
-                message += `WDPA ID: ${properties.wdpaId}\n`;
-              }
               message += `\n${properties.description}\n\n`;
-              message += properties.dataSource === 'protected_planet'
-                ? '✓ Official Protected Planet data'
-                : '⚠ Using placeholder boundary';
-              message += '\n\n[Detailed modal coming in Phase 4]';
+              message += 'ℹ️  Using approximate boundary\n';
+              message += '\n[Detailed modal coming in Phase 4]';
               alert(message);
             }
           }
