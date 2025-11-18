@@ -5,7 +5,23 @@ import { getPartnerAccountForMPA, calculateFees } from '@/lib/stripe-connect';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, company, mpaId, mpaName, hectares, isAnonymous } = body;
+    const {
+      name,
+      email,
+      company,
+      mpaId,
+      mpaName,
+      hectares,
+      isAnonymous,
+      // Gift fields
+      isGift,
+      giftRecipientName,
+      giftRecipientEmail,
+      giftMessage,
+      giftSendDate,
+      purchaserName,
+      purchaserEmail,
+    } = body;
 
     console.log('📝 Checkout request received:', {
       name,
@@ -15,6 +31,9 @@ export async function POST(request: Request) {
       mpaName,
       hectares,
       isAnonymous,
+      isGift,
+      giftRecipientName: isGift ? giftRecipientName : undefined,
+      giftRecipientEmail: isGift ? giftRecipientEmail : undefined,
     });
 
     // Validate required fields
@@ -108,6 +127,14 @@ export async function POST(request: Request) {
         partner_account_id: partnerAccount.stripe_account_id,
         platform_fee: fees.platformFee.toString(),
         partner_amount: fees.partnerAmount.toString(),
+        // Gift metadata
+        is_gift: isGift ? 'true' : 'false',
+        gift_recipient_name: giftRecipientName || '',
+        gift_recipient_email: giftRecipientEmail || '',
+        gift_message: giftMessage || '',
+        gift_send_date: giftSendDate || '',
+        purchaser_name: purchaserName || '',
+        purchaser_email: purchaserEmail || '',
       },
 
       customer_email: email,

@@ -384,6 +384,157 @@ export async function sendCertificateEmail(
   }
 }
 
+export async function sendGiftCertificateEmail(
+  recipientEmail: string,
+  recipientName: string,
+  purchaserEmail: string,
+  purchaserName: string,
+  mpaName: string,
+  mpaLocation: string,
+  hectares: number,
+  amount: number,
+  certificateId: string,
+  giftMessage: string | null,
+  certificatePdf: Buffer
+) {
+  try {
+    const quarterDate = new Date();
+    quarterDate.setMonth(quarterDate.getMonth() + 3);
+    const nextReportDate = quarterDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+    });
+
+    const info = await transporter.sendMail({
+      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
+      to: recipientEmail,
+      cc: purchaserEmail, // CC the gift giver
+      subject: `🎁 ${purchaserName} has gifted you coral reef protection!`,
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body { font-family: 'Helvetica Neue', Arial, sans-serif; line-height: 1.8; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #0A2463 0%, #247BA0 100%); color: white; padding: 40px; text-align: center; border-radius: 8px 8px 0 0; }
+              .content { background: white; padding: 40px; border: 1px solid #e0e0e0; border-top: none; }
+              .gift-message { background: #fff7ed; padding: 20px; border-left: 4px solid #f59e0b; margin: 20px 0; font-style: italic; border-radius: 4px; }
+              .stats { background: #f0f9ff; padding: 25px; border-radius: 8px; margin: 25px 0; border: 1px solid #0ea5e9; }
+              .stats ul { list-style: none; padding: 0; margin: 15px 0; }
+              .stats li { padding: 10px 0; border-bottom: 1px solid #e0f2fe; }
+              .stats li:last-child { border-bottom: none; }
+              .footer { text-align: center; padding: 30px 20px; color: #666; font-size: 14px; background: #f8f9fa; border-radius: 0 0 8px 8px; }
+              .button { display: inline-block; background: #3BCEAC; color: white !important; padding: 14px 35px; text-decoration: none; border-radius: 6px; margin: 20px 0; font-weight: bold; }
+              h1 { margin: 0 0 10px 0; font-size: 32px; }
+              h2 { color: #0A2463; margin-top: 0; }
+              h3 { color: #247BA0; margin-top: 25px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>🎁 You've Received a Gift!</h1>
+                <p style="font-size: 18px; margin: 10px 0 0 0; opacity: 0.95;">A special gift of ocean protection</p>
+              </div>
+
+              <div class="content">
+                <p style="font-size: 18px; color: #0A2463; font-weight: 600;">
+                  Dear ${recipientName},
+                </p>
+
+                <p style="font-size: 16px;">
+                  <strong>${purchaserName}</strong> has gifted you the protection of
+                  <strong>${hectares} hectare${hectares > 1 ? 's' : ''}</strong>
+                  of climate-resilient coral reef in <strong>${mpaName}</strong>!
+                </p>
+
+                ${giftMessage ? `
+                  <div class="gift-message">
+                    <strong style="color: #92400e;">💌 Personal message:</strong><br>
+                    <span style="color: #78350f;">"${giftMessage}"</span>
+                  </div>
+                ` : ''}
+
+                <div class="stats">
+                  <h3 style="margin-top: 0; color: #0A2463;">🌊 What This Gift Protects:</h3>
+                  <ul>
+                    <li>🪸 <strong>~${hectares * 220} coral colonies</strong> in a climate refugium</li>
+                    <li>🐟 Critical habitat for <strong>1,000+ fish species</strong></li>
+                    <li>🦈 Sanctuary for endangered species like hawksbill turtles</li>
+                    <li>📊 You'll receive <strong>quarterly impact reports</strong> from the field</li>
+                    <li>📍 GPS coordinates to <strong>visit your reef</strong> anytime</li>
+                  </ul>
+                </div>
+
+                <p>
+                  Your personalized certificate is attached to this email. You can save it, print it,
+                  or share it on social media to inspire others!
+                </p>
+
+                <center>
+                  <a href="${process.env.NEXT_PUBLIC_BASE_URL}/registry?id=${certificateId}" class="button">View in Public Registry →</a>
+                </center>
+
+                <h3>📋 YOUR IMPACT SUMMARY</h3>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                  <p style="margin: 5px 0;"><strong>Location:</strong> ${mpaLocation}</p>
+                  <p style="margin: 5px 0;"><strong>Area Protected:</strong> ${hectares} hectare${hectares > 1 ? 's' : ''}</p>
+                  <p style="margin: 5px 0;"><strong>Certificate ID:</strong> ${certificateId}</p>
+                  <p style="margin: 5px 0;"><strong>Contribution:</strong> $${amount} USD</p>
+                </div>
+
+                <h3>🎯 What Your Gift Funds</h3>
+                <ul>
+                  <li><strong>Ranger Patrols:</strong> Preventing illegal fishing and protecting marine life</li>
+                  <li><strong>Biodiversity Monitoring:</strong> Tracking coral health and fish populations</li>
+                  <li><strong>Waste Removal:</strong> Cleaning debris and plastic pollution from reefs</li>
+                  <li><strong>Community Education:</strong> Training local communities in reef conservation</li>
+                </ul>
+
+                <h3>📅 What Happens Next</h3>
+                <ul>
+                  <li>Your certificate is attached to this email as a PDF</li>
+                  <li>You're now listed in our Public Impact Registry</li>
+                  <li>You'll receive quarterly impact reports starting <strong>${nextReportDate}</strong></li>
+                  <li>Your funds are already supporting active conservation programs</li>
+                </ul>
+
+                <p style="color: #666; font-size: 14px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                  This gift supports direct reef protection efforts by local conservation partners.
+                  Thank you for being part of the solution to protect our ocean's future.
+                </p>
+
+                <p style="margin-top: 25px;">With deep gratitude,<br><strong>The Coral Refuge Team</strong></p>
+              </div>
+
+              <div class="footer">
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Built with science. Driven by purpose.</p>
+                <p style="margin: 5px 0;">Questions? Reply to this email or visit our website</p>
+                <p style="margin: 5px 0; font-size: 12px; color: #999;">${process.env.GMAIL_USER}</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `,
+      attachments: [
+        {
+          filename: `Coral-Refuge-Certificate-${certificateId}.pdf`,
+          content: certificatePdf,
+          contentType: 'application/pdf',
+        },
+      ],
+    });
+
+    console.log('Gift certificate email sent:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Failed to send gift certificate email:', error);
+    return { success: false, error };
+  }
+}
+
 export async function sendAdminNotification(
   subject: string,
   message: string,
