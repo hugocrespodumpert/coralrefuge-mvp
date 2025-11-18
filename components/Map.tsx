@@ -1,21 +1,29 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { fetchMPABoundaries, mpasToGeoJSON, type EnhancedMPA } from '@/lib/mpa-service';
+import { getMPAById, type MPAFeature } from '@/lib/mpa-data';
 import CoralToggleControl from './CoralToggleControl';
 import CoralLegend from './CoralLegend';
+import MPADetailModal from './MPADetailModal';
 
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const popup = useRef<mapboxgl.Popup | null>(null);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // MPA data state
   const [mpas, setMpas] = useState<EnhancedMPA[]>([]);
+
+  // Modal state
+  const [selectedMPA, setSelectedMPA] = useState<MPAFeature | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   // Coral layer state
   const [coralVisible, setCoralVisible] = useState(false);
@@ -221,24 +229,25 @@ export default function Map() {
           }
         });
 
-        // Click event
+        // Click event - Open MPA Detail Modal
         map.current.on('click', 'mpa-fills', (e) => {
           if (e.features && e.features.length > 0) {
             const feature = e.features[0];
             const properties = feature.properties;
 
-            if (properties) {
-              console.log('MPA clicked:', properties);
+            if (properties && properties.id) {
+              console.log('🗺️  MPA clicked:', properties.name);
 
-              // Simple alert (will be replaced with modal in Phase 4)
-              let message = `${properties.name}\n\n`;
-              message += `Size: ${Number(properties.hectares).toLocaleString()} hectares\n`;
-              message += `Designation: ${properties.designation}\n`;
-              message += `Managed by: ${properties.partner}\n`;
-              message += `\n${properties.description}\n\n`;
-              message += 'ℹ️  Using approximate boundary\n';
-              message += '\n[Detailed modal coming in Phase 4]';
-              alert(message);
+              // Get full MPA data with all properties
+              const mpaData = getMPAById(properties.id);
+
+              if (mpaData) {
+                console.log('✅ Opening modal for:', mpaData.properties.name);
+                setSelectedMPA(mpaData);
+                setModalOpen(true);
+              } else {
+                console.warn('⚠️  MPA data not found for ID:', properties.id);
+              }
             }
           }
         });
@@ -371,6 +380,13 @@ export default function Map() {
     }
   };
 
+  // Handle sponsorship CTA
+  const handleSponsor = (mpaSlug: string) => {
+    console.log('🎯 Sponsor CTA clicked for:', mpaSlug);
+    // Pre-fill sponsorship form with selected MPA
+    router.push(`/sponsor?mpa=${mpaSlug}`);
+  };
+
   // Error state
   if (error) {
     return (
@@ -417,6 +433,14 @@ export default function Map() {
           <CoralLegend isVisible={coralVisible} />
         </>
       )}
+
+      {/* MPA Detail Modal */}
+      <MPADetailModal
+        mpa={selectedMPA}
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSponsor={handleSponsor}
+      />
 
       {/* Loading Overlay */}
       {isLoading && (

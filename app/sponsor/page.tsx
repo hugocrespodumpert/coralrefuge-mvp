@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/Button';
 
@@ -53,6 +54,7 @@ const mpas: MPA[] = [
 ];
 
 export default function SponsorPage() {
+  const searchParams = useSearchParams();
   const [selectedMPA, setSelectedMPA] = useState<MPA | null>(null);
   const [hectares, setHectares] = useState(1);
   const [formData, setFormData] = useState({
@@ -66,6 +68,25 @@ export default function SponsorPage() {
 
   const pricePerHectare = 50;
   const totalPrice = hectares * pricePerHectare;
+
+  // Pre-select MPA from query parameter (e.g., /sponsor?mpa=ras-mohammed)
+  useEffect(() => {
+    const mpaSlug = searchParams.get('mpa');
+    if (mpaSlug) {
+      const mpa = mpas.find(m => m.id === mpaSlug);
+      if (mpa) {
+        console.log('🎯 Pre-selecting MPA from URL:', mpa.name);
+        setSelectedMPA(mpa);
+        // Scroll to form section
+        setTimeout(() => {
+          const formSection = document.getElementById('sponsor-form');
+          if (formSection) {
+            formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
+      }
+    }
+  }, [searchParams]);
 
   const handleSelectMPA = (mpa: MPA) => {
     setSelectedMPA(mpa);
@@ -226,7 +247,7 @@ export default function SponsorPage() {
                 </div>
               )}
 
-              <form onSubmit={handleProceedToPayment} className="space-y-6">
+              <form id="sponsor-form" onSubmit={handleProceedToPayment} className="space-y-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Full Name *
