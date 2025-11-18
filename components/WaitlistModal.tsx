@@ -127,10 +127,10 @@ export default function WaitlistModal({ isOpen, onClose }: WaitlistModalProps) {
                 </svg>
               </div>
               <h3 className="text-2xl font-bold text-navy-deep mb-2">
-                Thanks! You're on the list
+                Thanks! You&apos;re on the list
               </h3>
               <p className="text-gray-600">
-                We'll email you when we launch.
+                We&apos;ll email you when we launch.
               </p>
               <p className="text-sm text-teal mt-4">
                 In the meantime, explore our interactive map →

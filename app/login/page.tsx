@@ -61,7 +61,7 @@ export default function LoginPage() {
                 Check your email!
               </h3>
               <p className="text-gray-600 mb-4">
-                We've sent a magic link to <strong>{email}</strong>
+                We&apos;ve sent a magic link to <strong>{email}</strong>
               </p>
               <p className="text-sm text-gray-500">
                 Click the link in the email to sign in. The link is valid for 30 days and will keep you logged in.
@@ -101,7 +101,7 @@ export default function LoginPage() {
                     placeholder="John Doe"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    We'll use this for your certificate
+                    We&apos;ll use this for your certificate
                   </p>
                 </div>
 
@@ -131,7 +131,7 @@ export default function LoginPage() {
 
               <div className="mt-6 pt-6 border-t border-gray-200">
                 <p className="text-sm text-gray-600 text-center mb-4">
-                  <strong>No password needed!</strong> We'll email you a secure link that logs you in automatically.
+                  <strong>No password needed!</strong> We&apos;ll email you a secure link that logs you in automatically.
                 </p>
                 <ul className="space-y-2 text-xs text-gray-500">
                   <li className="flex items-start">
@@ -164,7 +164,7 @@ export default function LoginPage() {
         {/* Info Box */}
         <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
           <p className="text-sm text-blue-800">
-            <strong>New here?</strong> After your first sponsorship, you'll receive an email invitation to create your portfolio account.
+            <strong>New here?</strong> After your first sponsorship, you&apos;ll receive an email invitation to create your portfolio account.
           </p>
         </div>
       </div>

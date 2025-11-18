@@ -20,13 +20,13 @@ interface Sponsorship {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { name?: string } } | null>(null);
   const [sponsorships, setSponsorships] = useState<Sponsorship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
 
   useEffect(() => {
     loadUserData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadUserData = async () => {
@@ -46,8 +46,7 @@ export default function DashboardPage() {
         setSponsorships(sponsorshipsResult.sponsorships);
       }
     } catch (err) {
-      setError('Failed to load dashboard data');
-      console.error(err);
+      console.error('Failed to load dashboard data:', err);
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +60,6 @@ export default function DashboardPage() {
   // Calculate total stats
   const totalHectares = sponsorships.reduce((sum, s) => sum + s.hectares, 0);
   const totalCoralColonies = Math.round(totalHectares * 220); // ~220 colonies per hectare
-  const totalSpent = sponsorships.reduce((sum, s) => sum + s.amount, 0);
   const memberSince = sponsorships.length > 0
     ? new Date(sponsorships[sponsorships.length - 1].created_at).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -93,7 +91,7 @@ export default function DashboardPage() {
                 Hi {user?.user_metadata?.name || user?.email?.split('@')[0]}! 👋
               </h1>
               <p className="text-white/90">
-                You've protected <strong>{totalHectares}</strong> hectares across{' '}
+                You&apos;ve protected <strong>{totalHectares}</strong> hectares across{' '}
                 <strong>{uniqueMPAs}</strong> {uniqueMPAs === 1 ? 'MPA' : 'MPAs'}
               </p>
             </div>
@@ -116,8 +114,8 @@ export default function DashboardPage() {
               <div className="text-sm text-white/80">Coral Colonies</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-              <div className="text-2xl md:text-3xl font-bold mb-1">${totalSpent}</div>
-              <div className="text-sm text-white/80">Total Investment</div>
+              <div className="text-2xl md:text-3xl font-bold mb-1">{uniqueMPAs}</div>
+              <div className="text-sm text-white/80">Protected MPAs</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
               <div className="text-2xl md:text-3xl font-bold mb-1">{memberSince}</div>
