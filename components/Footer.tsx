@@ -4,21 +4,21 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-ocean-deep text-white py-12">
+    <footer className="bg-navy-deep text-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Tagline */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-turquoise rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-teal rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xl">🪸</span>
               </div>
               <span className="font-bold text-xl">Coral Refuge</span>
             </Link>
-            <p className="text-white/80 mb-4 italic">
+            <p className="font-serif text-white/80 mb-4 italic text-lg">
               Built with science. Driven by purpose.
             </p>
-            <p className="text-white/70 text-sm">
+            <p className="text-white/70 text-sm leading-relaxed">
               Protecting climate-resilient coral reefs through marine protected area sponsorship.
             </p>
           </div>
