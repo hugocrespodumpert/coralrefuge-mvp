@@ -15,6 +15,17 @@ interface RegistryEntry {
   isAnonymous: boolean;
 }
 
+interface SponsorshipData {
+  id: string;
+  certificate_id: string;
+  sponsor_name: string;
+  company?: string;
+  mpa_name: string;
+  hectares: number;
+  is_anonymous: boolean;
+  created_at: string;
+}
+
 export default function RegistryPage() {
   const [filter, setFilter] = useState<string>('all');
   const [entries, setEntries] = useState<RegistryEntry[]>([]);
@@ -35,7 +46,7 @@ export default function RegistryPage() {
     if (error) {
       console.error('Error fetching sponsorships:', error);
     } else {
-      const formattedEntries = (data || []).map((item: any) => ({
+      const formattedEntries = (data || []).map((item: SponsorshipData) => ({
         id: item.id,
         certificate_id: item.certificate_id,
         sponsorName: item.sponsor_name,

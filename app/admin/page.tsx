@@ -21,6 +21,7 @@ interface Sponsorship {
   certificate_url?: string;
   created_at: string;
   updated_at?: string;
+  email_sent_at?: string;
   // 🔑 Stripe Connect fields
   connected_account_id?: string;
   platform_fee_amount?: number;
