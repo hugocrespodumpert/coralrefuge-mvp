@@ -5,6 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/Button';
 
+export const dynamic = 'force-dynamic';
+
 interface MPA {
   id: string;
   name: string;
