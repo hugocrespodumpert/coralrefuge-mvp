@@ -49,9 +49,7 @@ export default function MapPage() {
           </div>
         </div>
         <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-200">
-          Phase 1: Placeholder boundaries
-          <br />
-          Real polygons coming in Phase 3
+          Using approximate placeholder boundaries for demonstration
         </p>
       </div>
     </main>

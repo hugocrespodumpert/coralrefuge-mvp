@@ -8,6 +8,7 @@ interface CoralToggleControlProps {
   onToggle: (visible: boolean) => void;
   onOpacityChange: (opacity: number) => void;
   isLoading?: boolean;
+  error?: string | null;
 }
 
 export default function CoralToggleControl({
@@ -16,6 +17,7 @@ export default function CoralToggleControl({
   onToggle,
   onOpacityChange,
   isLoading = false,
+  error = null,
 }: CoralToggleControlProps) {
   const [isExpanded, setIsExpanded] = useState(true);
 
@@ -100,6 +102,16 @@ export default function CoralToggleControl({
                     }%, #E5E7EB ${opacity * 100}%, #E5E7EB 100%)`,
                   }}
                 />
+              </div>
+            )}
+
+            {/* Error Message */}
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-md p-2">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-500 text-sm">⚠️</span>
+                  <p className="text-xs text-red-700">{error}</p>
+                </div>
               </div>
             )}
 
