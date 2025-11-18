@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { mpaGeoJSON } from '@/lib/mpa-data';
+import CoralToggleControl from './CoralToggleControl';
+import CoralLegend from './CoralLegend';
 
 export default function Map() {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -11,6 +13,11 @@ export default function Map() {
   const popup = useRef<mapboxgl.Popup | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Coral layer state
+  const [coralVisible, setCoralVisible] = useState(false);
+  const [coralOpacity, setCoralOpacity] = useState(0.6);
+  const [coralLoading, setCoralLoading] = useState(false);
 
   useEffect(() => {
     // Check if Mapbox token is available
@@ -52,6 +59,41 @@ export default function Map() {
       // Wait for map to load
       map.current.on('load', () => {
         if (!map.current) return;
+
+        // Add Allen Coral Atlas WMS source
+        map.current.addSource('coral-atlas', {
+          type: 'raster',
+          tiles: [
+            'https://allencoralatlas.org/geoserver/wms?' +
+            'service=WMS&' +
+            'version=1.1.1&' +
+            'request=GetMap&' +
+            'layers=allen_coral_atlas:benthic&' +
+            'bbox={bbox-epsg-3857}&' +
+            'width=256&' +
+            'height=256&' +
+            'srs=EPSG:3857&' +
+            'styles=&' +
+            'format=image/png&' +
+            'transparent=true'
+          ],
+          tileSize: 256,
+          attribution: '© Allen Coral Atlas'
+        });
+
+        // Add coral cover layer (initially hidden)
+        map.current.addLayer({
+          id: 'coral-cover',
+          type: 'raster',
+          source: 'coral-atlas',
+          layout: {
+            visibility: 'none'
+          },
+          paint: {
+            'raster-opacity': 0.6,
+            'raster-fade-duration': 300
+          }
+        });
 
         // Add MPA GeoJSON source
         map.current.addSource('mpa-boundaries', {
@@ -188,6 +230,39 @@ export default function Map() {
     };
   }, []);
 
+  // Coral layer control functions
+  const toggleCoralLayer = (visible: boolean) => {
+    if (!map.current) return;
+
+    setCoralLoading(true);
+    setCoralVisible(visible);
+
+    try {
+      map.current.setLayoutProperty(
+        'coral-cover',
+        'visibility',
+        visible ? 'visible' : 'none'
+      );
+    } catch (err) {
+      console.error('Error toggling coral layer:', err);
+    } finally {
+      // Small delay to show loading state
+      setTimeout(() => setCoralLoading(false), 300);
+    }
+  };
+
+  const updateCoralOpacity = (opacity: number) => {
+    if (!map.current) return;
+
+    setCoralOpacity(opacity);
+
+    try {
+      map.current.setPaintProperty('coral-cover', 'raster-opacity', opacity);
+    } catch (err) {
+      console.error('Error updating coral opacity:', err);
+    }
+  };
+
   // Error state
   if (error) {
     return (
@@ -219,6 +294,20 @@ export default function Map() {
     <div className="relative w-full h-full">
       {/* Map Container */}
       <div ref={mapContainer} className="w-full h-full" />
+
+      {/* Coral Layer Controls */}
+      {!isLoading && !error && (
+        <>
+          <CoralToggleControl
+            isVisible={coralVisible}
+            opacity={coralOpacity}
+            onToggle={toggleCoralLayer}
+            onOpacityChange={updateCoralOpacity}
+            isLoading={coralLoading}
+          />
+          <CoralLegend isVisible={coralVisible} />
+        </>
+      )}
 
       {/* Loading Overlay */}
       {isLoading && (
