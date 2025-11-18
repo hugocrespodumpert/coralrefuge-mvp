@@ -19,6 +19,7 @@ export default function Navigation() {
   const navLinks = [
     { href: '/about', label: 'About' },
     { href: '/partners', label: 'Partners' },
+    { href: '/map', label: 'Explore Map' },
     { href: '/registry', label: 'Registry' },
   ];
 
