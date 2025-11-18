@@ -57,6 +57,16 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/dashboard"
+              className={`font-medium transition-colors ${
+                isScrolled
+                  ? 'text-gray-700 hover:text-teal'
+                  : 'text-white/90 hover:text-white'
+              }`}
+            >
+              My Portfolio
+            </Link>
             <Button href="/sponsor" size="sm">
               Protect Reefs
             </Button>
@@ -107,6 +117,13 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/dashboard"
+              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              My Portfolio
+            </Link>
             <div className="px-4 py-2">
               <Button href="/sponsor" size="sm" className="w-full">
                 Protect Reefs
