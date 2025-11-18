@@ -21,6 +21,7 @@ export default function Map() {
   const [coralVisible, setCoralVisible] = useState(false);
   const [coralOpacity, setCoralOpacity] = useState(0.6);
   const [coralLoading, setCoralLoading] = useState(false);
+  const [coralError, setCoralError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check if Mapbox token is available
@@ -63,40 +64,57 @@ export default function Map() {
       map.current.on('load', () => {
         if (!map.current) return;
 
+        console.log('🗺️  Map loaded successfully');
+
         // Add Allen Coral Atlas WMS source
-        map.current.addSource('coral-atlas', {
-          type: 'raster',
-          tiles: [
-            'https://allencoralatlas.org/geoserver/wms?' +
-            'service=WMS&' +
-            'version=1.1.1&' +
-            'request=GetMap&' +
-            'layers=allen_coral_atlas:benthic&' +
-            'bbox={bbox-epsg-3857}&' +
-            'width=256&' +
-            'height=256&' +
-            'srs=EPSG:3857&' +
-            'styles=&' +
-            'format=image/png&' +
-            'transparent=true'
-          ],
-          tileSize: 256,
-          attribution: '© Allen Coral Atlas'
-        });
+        // Using updated endpoint with version 1.3.0
+        console.log('🪸 Adding Allen Coral Atlas WMS source...');
+        try {
+          map.current.addSource('coral-atlas', {
+            type: 'raster',
+            tiles: [
+              'https://allencoralatlas.org/geoserver/coral-atlas/wms?' +
+              'service=WMS&' +
+              'version=1.3.0&' +
+              'request=GetMap&' +
+              'layers=coral-atlas:benthic&' +
+              'bbox={bbox-epsg-3857}&' +
+              'width=256&' +
+              'height=256&' +
+              'crs=EPSG:3857&' +
+              'format=image/png&' +
+              'transparent=true'
+            ],
+            tileSize: 256,
+            attribution: '© Allen Coral Atlas'
+          });
+          console.log('✅ Coral Atlas source added:', map.current.getSource('coral-atlas') ? 'EXISTS' : 'MISSING');
+        } catch (err) {
+          console.error('❌ Failed to add coral source:', err);
+          setCoralError('Failed to add coral data source');
+        }
 
         // Add coral cover layer (initially hidden)
-        map.current.addLayer({
-          id: 'coral-cover',
-          type: 'raster',
-          source: 'coral-atlas',
-          layout: {
-            visibility: 'none'
-          },
-          paint: {
-            'raster-opacity': 0.6,
-            'raster-fade-duration': 300
-          }
-        });
+        // IMPORTANT: Add BEFORE MPA layers so MPA borders stay on top
+        console.log('🪸 Adding coral cover layer...');
+        try {
+          map.current.addLayer({
+            id: 'coral-cover',
+            type: 'raster',
+            source: 'coral-atlas',
+            layout: {
+              visibility: 'none'
+            },
+            paint: {
+              'raster-opacity': 0.6,
+              'raster-fade-duration': 300
+            }
+          });
+          console.log('✅ Coral layer added:', map.current.getLayer('coral-cover') ? 'EXISTS' : 'MISSING');
+        } catch (err) {
+          console.error('❌ Failed to add coral layer:', err);
+          setCoralError('Failed to add coral visualization layer');
+        }
 
         // Add MPA GeoJSON source (initially empty, will be populated when data loads)
         map.current.addSource('mpa-boundaries', {
@@ -231,8 +249,18 @@ export default function Map() {
       // Handle map errors
       map.current.on('error', (e) => {
         console.error('Map error:', e);
-        setError('Failed to load map. Please check your internet connection and Mapbox token.');
-        setIsLoading(false);
+
+        // Check if error is related to coral tiles
+        // Mapbox error events may include sourceId in the error object
+        const errorObj = e.error as any;
+        if (errorObj && (errorObj.sourceId === 'coral-atlas' || e.toString().includes('coral-atlas'))) {
+          console.error('❌ Coral Atlas tiles failed to load:', e);
+          setCoralError('Coral data temporarily unavailable');
+          // Don't set main error - map should still work without coral layer
+        } else {
+          setError('Failed to load map. Please check your internet connection and Mapbox token.');
+          setIsLoading(false);
+        }
       });
 
     } catch (err) {
@@ -281,19 +309,50 @@ export default function Map() {
 
   // Coral layer control functions
   const toggleCoralLayer = (visible: boolean) => {
-    if (!map.current) return;
+    if (!map.current) {
+      console.warn('⚠️  Map not initialized');
+      return;
+    }
+
+    console.log(`🪸 Toggle coral layer: ${visible ? 'SHOW' : 'HIDE'}`);
 
     setCoralLoading(true);
     setCoralVisible(visible);
 
     try {
+      // Verify layer exists
+      const layer = map.current.getLayer('coral-cover');
+      if (!layer) {
+        console.error('❌ Coral layer not found!');
+        setCoralError('Coral layer not initialized');
+        setCoralLoading(false);
+        return;
+      }
+
+      // Verify source exists
+      const source = map.current.getSource('coral-atlas');
+      if (!source) {
+        console.error('❌ Coral source not found!');
+        setCoralError('Coral data source not initialized');
+        setCoralLoading(false);
+        return;
+      }
+
+      console.log('✅ Layer and source exist, setting visibility...');
       map.current.setLayoutProperty(
         'coral-cover',
         'visibility',
         visible ? 'visible' : 'none'
       );
+      console.log(`✅ Coral visibility set to: ${visible ? 'visible' : 'none'}`);
+
+      // Clear any previous errors on successful toggle
+      if (coralError) {
+        setCoralError(null);
+      }
     } catch (err) {
-      console.error('Error toggling coral layer:', err);
+      console.error('❌ Error toggling coral layer:', err);
+      setCoralError('Failed to toggle coral overlay');
     } finally {
       // Small delay to show loading state
       setTimeout(() => setCoralLoading(false), 300);
@@ -353,6 +412,7 @@ export default function Map() {
             onToggle={toggleCoralLayer}
             onOpacityChange={updateCoralOpacity}
             isLoading={coralLoading}
+            error={coralError}
           />
           <CoralLegend isVisible={coralVisible} />
         </>
