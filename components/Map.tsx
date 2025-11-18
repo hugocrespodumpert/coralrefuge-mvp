@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { mpaGeoJSON } from '@/lib/mpa-data';
+import { fetchMPABoundaries, mpasToGeoJSON, type EnhancedMPA } from '@/lib/mpa-service';
 import CoralToggleControl from './CoralToggleControl';
 import CoralLegend from './CoralLegend';
 
@@ -13,6 +13,9 @@ export default function Map() {
   const popup = useRef<mapboxgl.Popup | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // MPA data state
+  const [mpas, setMpas] = useState<EnhancedMPA[]>([]);
 
   // Coral layer state
   const [coralVisible, setCoralVisible] = useState(false);
@@ -95,10 +98,13 @@ export default function Map() {
           }
         });
 
-        // Add MPA GeoJSON source
+        // Add MPA GeoJSON source (initially empty, will be populated when data loads)
         map.current.addSource('mpa-boundaries', {
           type: 'geojson',
-          data: mpaGeoJSON as GeoJSON.FeatureCollection<GeoJSON.Geometry>
+          data: {
+            type: 'FeatureCollection',
+            features: []
+          } as GeoJSON.FeatureCollection<GeoJSON.Geometry>
         });
 
         // Add fill layer for MPA polygons
@@ -147,12 +153,23 @@ export default function Map() {
             const properties = feature.properties;
 
             if (properties) {
-              // Show tooltip popup
+              // Show enhanced tooltip with metadata
               if (popup.current && e.lngLat) {
                 const htmlContent = `
-                  <div class="font-sans">
-                    <h3 class="font-bold text-base mb-1">${properties.name}</h3>
-                    <p class="text-sm text-gray-600">${properties.hectares.toLocaleString()} hectares • Available to Sponsor</p>
+                  <div class="font-sans max-w-xs">
+                    <h3 class="font-bold text-base mb-2">${properties.name}</h3>
+                    <div class="space-y-1 text-sm text-gray-700">
+                      <div>📏 ${Number(properties.hectares).toLocaleString()} hectares</div>
+                      ${properties.iucnCategory ? `<div>📋 IUCN Category ${properties.iucnCategory}</div>` : ''}
+                      <div>🏛️ ${properties.designation}</div>
+                      <div>🛡️ Managed by ${properties.partner}</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-200">
+                      <span class="text-blue-600 font-medium text-sm">✨ Available to Sponsor</span>
+                    </div>
+                    ${properties.dataSource === 'protected_planet'
+                      ? '<div class="text-xs text-green-600 mt-2">✓ Official WDPA data</div>'
+                      : '<div class="text-xs text-amber-600 mt-2">⚠ Placeholder boundary</div>'}
                   </div>
                 `;
 
@@ -198,8 +215,22 @@ export default function Map() {
             if (properties) {
               console.log('MPA clicked:', properties);
 
-              // Show simple alert for now (will be replaced with modal in Phase 4)
-              const message = `${properties.name}\n\nSize: ${properties.hectares.toLocaleString()} hectares\nManaged by: ${properties.partner}\nDesignation: ${properties.designation}\n\n${properties.description}\n\n[Detailed modal coming in Phase 4]`;
+              // Enhanced alert with metadata (will be replaced with modal in Phase 4)
+              let message = `${properties.name}\n\n`;
+              message += `Size: ${Number(properties.hectares).toLocaleString()} hectares\n`;
+              message += `Designation: ${properties.designation}\n`;
+              if (properties.iucnCategory) {
+                message += `IUCN Category: ${properties.iucnCategory}\n`;
+              }
+              message += `Managed by: ${properties.partner}\n`;
+              if (properties.wdpaId) {
+                message += `WDPA ID: ${properties.wdpaId}\n`;
+              }
+              message += `\n${properties.description}\n\n`;
+              message += properties.dataSource === 'protected_planet'
+                ? '✓ Official Protected Planet data'
+                : '⚠ Using placeholder boundary';
+              message += '\n\n[Detailed modal coming in Phase 4]';
               alert(message);
             }
           }
@@ -229,6 +260,35 @@ export default function Map() {
       }
     };
   }, []);
+
+  // Fetch MPA boundaries on component mount
+  useEffect(() => {
+    async function loadMPAs() {
+      try {
+        console.log('🗺️  Loading MPA boundaries...');
+        const mpaData = await fetchMPABoundaries();
+        setMpas(mpaData);
+        console.log(`✅ Loaded ${mpaData.length} MPAs`);
+      } catch (err) {
+        console.error('❌ Failed to load MPAs:', err);
+        // Keep mpas as empty array - map will show without MPAs
+      }
+    }
+
+    loadMPAs();
+  }, []);
+
+  // Update map source when MPAs are loaded
+  useEffect(() => {
+    if (!map.current || mpas.length === 0) return;
+
+    const source = map.current.getSource('mpa-boundaries') as mapboxgl.GeoJSONSource;
+    if (source) {
+      const geojson = mpasToGeoJSON(mpas);
+      source.setData(geojson as GeoJSON.FeatureCollection<GeoJSON.Geometry>);
+      console.log('✅ Updated map with MPA boundaries');
+    }
+  }, [mpas]);
 
   // Coral layer control functions
   const toggleCoralLayer = (visible: boolean) => {
