@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import Stripe from 'stripe';
 import { supabase } from '@/lib/supabase';
 import { generateCertificate, formatCertificateDate } from '@/lib/certificate-generator';
-import { sendCertificateEmail, sendAdminNotification } from '@/lib/email';
+import { sendCertificateEmail, sendGiftCertificateEmail, sendAdminNotification } from '@/lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-10-29.clover',
@@ -145,6 +145,17 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const platformFee = parseInt(metadata.platform_fee);
   const partnerAmount = parseInt(metadata.partner_amount);
 
+  // 🎁 NEW: Gift data
+  const isGift = metadata.is_gift === 'true';
+  const giftData = isGift ? {
+    gift_recipient_name: metadata.gift_recipient_name,
+    gift_recipient_email: metadata.gift_recipient_email,
+    gift_message: metadata.gift_message || null,
+    gift_send_date: metadata.gift_send_date || null,
+    purchaser_name: metadata.purchaser_name,
+    purchaser_email: metadata.purchaser_email,
+  } : {};
+
   console.log('📋 Processing payment for:', {
     sponsorName,
     sponsorEmail,
@@ -164,7 +175,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   console.log('💾 Saving sponsorship to database...');
 
-  // Save to Supabase with Stripe Connect data
+  // Save to Supabase with Stripe Connect data and gift data
   const { data: sponsorship, error: dbError } = await supabase
     .from('sponsorships')
     .insert({
@@ -187,6 +198,10 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       platform_fee_amount: platformFee,
       partner_amount: partnerAmount,
       partner_name: partnerName,
+
+      // 🎁 Gift fields
+      is_gift: isGift,
+      ...giftData,
     })
     .select()
     .single();
@@ -216,29 +231,54 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   const certificatePdf = await generateCertificate({
     certificateId,
-    sponsorName,
+    sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
     mpaName,
     mpaLocation: mpaData.location,
     hectares,
     amount,
     date: formatCertificateDate(now),
     validUntil: formatCertificateDate(validUntil),
+    // Gift fields
+    isGift,
+    giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
+    purchaserName: isGift ? sponsorship.purchaser_name : undefined,
+    giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
   });
 
   console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
 
   // Step 4: Send email with certificate
   console.log('📧 Sending certificate email...');
-  const emailResult = await sendCertificateEmail(
-    sponsorEmail,
-    sponsorName,
-    mpaName,
-    mpaData.location,
-    hectares,
-    amount,
-    certificateId,
-    certificatePdf
-  );
+  let emailResult;
+
+  if (isGift) {
+    // Send gift certificate email to recipient with CC to purchaser
+    emailResult = await sendGiftCertificateEmail(
+      sponsorship.gift_recipient_email!,
+      sponsorship.gift_recipient_name!,
+      sponsorship.purchaser_email!,
+      sponsorship.purchaser_name!,
+      mpaName,
+      mpaData.location,
+      hectares,
+      amount,
+      certificateId,
+      sponsorship.gift_message,
+      certificatePdf
+    );
+  } else {
+    // Send regular certificate email
+    emailResult = await sendCertificateEmail(
+      sponsorEmail,
+      sponsorName,
+      mpaName,
+      mpaData.location,
+      hectares,
+      amount,
+      certificateId,
+      certificatePdf
+    );
+  }
 
   if (emailResult.success) {
     console.log('✅ Certificate email sent successfully');
@@ -255,21 +295,34 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   // Step 5: Notify admin of new sponsorship
   console.log('📬 Sending admin notification...');
-  await sendAdminNotification(
-    '🎉 New Sponsorship Received!',
-    `A new coral reef sponsorship has been successfully processed.`,
-    {
-      'Sponsor': isAnonymous ? 'Anonymous' : sponsorName,
-      'Email': sponsorEmail,
-      'MPA': mpaName,
-      'Partner': partnerName,
-      'Hectares': hectares,
-      'Amount': `$${amount}`,
-      'Platform Fee (15%)': `$${(platformFee / 100).toFixed(2)}`,
-      'Partner Receives (85%)': `$${(partnerAmount / 100).toFixed(2)}`,
-      'Certificate ID': certificateId,
-      'Session ID': session.id,
+  const adminDetails: Record<string, string | number> = {
+    'Type': isGift ? '🎁 Gift' : 'Regular',
+    'Sponsor': isAnonymous ? 'Anonymous' : sponsorName,
+    'Email': sponsorEmail,
+    'MPA': mpaName,
+    'Partner': partnerName,
+    'Hectares': hectares,
+    'Amount': `$${amount}`,
+    'Platform Fee (15%)': `$${(platformFee / 100).toFixed(2)}`,
+    'Partner Receives (85%)': `$${(partnerAmount / 100).toFixed(2)}`,
+    'Certificate ID': certificateId,
+    'Session ID': session.id,
+  };
+
+  // Add gift details if applicable
+  if (isGift) {
+    adminDetails['Gift Recipient'] = sponsorship.gift_recipient_name!;
+    adminDetails['Recipient Email'] = sponsorship.gift_recipient_email!;
+    adminDetails['Gift From'] = sponsorship.purchaser_name!;
+    if (sponsorship.gift_message) {
+      adminDetails['Gift Message'] = sponsorship.gift_message;
     }
+  }
+
+  await sendAdminNotification(
+    isGift ? '🎁 New Gift Sponsorship Received!' : '🎉 New Sponsorship Received!',
+    `A new coral reef sponsorship has been successfully processed.`,
+    adminDetails
   );
 
   console.log('🎉 Payment processing completed successfully!');

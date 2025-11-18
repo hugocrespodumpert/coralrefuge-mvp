@@ -66,6 +66,13 @@ export default function SponsorPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
+  // Gift-related state
+  const [isGift, setIsGift] = useState(false);
+  const [giftRecipientName, setGiftRecipientName] = useState('');
+  const [giftRecipientEmail, setGiftRecipientEmail] = useState('');
+  const [giftMessage, setGiftMessage] = useState('');
+  const [giftSendDate, setGiftSendDate] = useState('');
+
   const pricePerHectare = 150;
   const totalPrice = hectares * pricePerHectare;
 
@@ -93,9 +100,29 @@ export default function SponsorPage() {
     setError('');
   };
 
+  const validateGiftForm = () => {
+    if (isGift) {
+      if (!giftRecipientName.trim()) {
+        setError('Please enter recipient name');
+        return false;
+      }
+      if (!giftRecipientEmail.trim() || !giftRecipientEmail.includes('@')) {
+        setError('Please enter valid recipient email');
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleProceedToPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Validate gift form if it's a gift
+    if (!validateGiftForm()) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -113,6 +140,15 @@ export default function SponsorPage() {
           mpaName: selectedMPA?.name,
           hectares,
           isAnonymous: formData.isAnonymous,
+          // Gift data
+          isGift,
+          giftRecipientName: isGift ? giftRecipientName : null,
+          giftRecipientEmail: isGift ? giftRecipientEmail : null,
+          giftMessage: isGift ? giftMessage : null,
+          giftSendDate: isGift ? giftSendDate || new Date().toISOString().split('T')[0] : null,
+          // Capture purchaser info for gifts
+          purchaserName: formData.name,
+          purchaserEmail: formData.email,
         }),
       });
 
@@ -287,6 +323,97 @@ export default function SponsorPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
                     placeholder="Your Company"
                   />
+                </div>
+
+                {/* Gift Toggle and Fields */}
+                <div className="mt-6 space-y-4">
+                  <label className="flex items-center gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={isGift}
+                      onChange={(e) => setIsGift(e.target.checked)}
+                      className="w-5 h-5 rounded border-gray-300 text-turquoise focus:ring-turquoise"
+                    />
+                    <span className="text-lg font-medium text-gray-900 group-hover:text-turquoise transition">
+                      🎁 This is a gift
+                    </span>
+                  </label>
+
+                  {isGift && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 space-y-4 border-2 border-turquoise/30 animate-fadeIn">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4">
+                        Gift Details
+                      </h3>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Recipient Name *
+                        </label>
+                        <input
+                          type="text"
+                          value={giftRecipientName}
+                          onChange={(e) => setGiftRecipientName(e.target.value)}
+                          placeholder="Jane Smith"
+                          required={isGift}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-turquoise focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Recipient Email *
+                        </label>
+                        <input
+                          type="email"
+                          value={giftRecipientEmail}
+                          onChange={(e) => setGiftRecipientEmail(e.target.value)}
+                          placeholder="jane@example.com"
+                          required={isGift}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-turquoise focus:border-transparent"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Personal Message (optional)
+                        </label>
+                        <textarea
+                          value={giftMessage}
+                          onChange={(e) => setGiftMessage(e.target.value.slice(0, 150))}
+                          placeholder="Happy birthday! I've protected coral reefs in your honor..."
+                          rows={3}
+                          maxLength={150}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-turquoise focus:border-transparent resize-none"
+                        />
+                        <p className="text-xs text-gray-500 mt-1 text-right">
+                          {giftMessage.length}/150 characters
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Send Certificate On
+                        </label>
+                        <input
+                          type="date"
+                          value={giftSendDate}
+                          onChange={(e) => setGiftSendDate(e.target.value)}
+                          min={new Date().toISOString().split('T')[0]}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-turquoise focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Leave blank to send immediately after purchase
+                        </p>
+                      </div>
+
+                      <div className="bg-white rounded-lg p-4 border border-turquoise/30">
+                        <p className="text-sm text-gray-600">
+                          <strong>What happens next:</strong> Your recipient will receive a beautiful certificate
+                          via email with your personal message. You&apos;ll be CC&apos;d on the email and receive a confirmation.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="bg-white rounded-lg p-4 border-2 border-gray-200">

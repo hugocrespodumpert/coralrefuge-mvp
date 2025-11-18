@@ -10,6 +10,11 @@ export interface CertificateData {
   amount: number;
   date: string;
   validUntil: string;
+  // Optional gift fields
+  isGift?: boolean;
+  giftRecipientName?: string;
+  purchaserName?: string;
+  giftMessage?: string;
 }
 
 /**
@@ -108,6 +113,56 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   // ----- MAIN CONTENT SECTION -----
 
   let currentY = headerY - 50;
+
+  // 🎁 GIFT BANNER (if it's a gift)
+  if (data.isGift && data.purchaserName && data.giftRecipientName) {
+    const giftBannerHeight = 60;
+    const giftBannerWidth = width - 2 * margin - 80;
+    const giftBannerX = width / 2 - giftBannerWidth / 2;
+    const giftBannerY = currentY - giftBannerHeight;
+
+    // Draw gift banner box
+    page.drawRectangle({
+      x: giftBannerX,
+      y: giftBannerY,
+      width: giftBannerWidth,
+      height: giftBannerHeight,
+      color: rgb(0.941, 0.976, 1), // Very light blue
+      borderColor: lightBlue,
+      borderWidth: 2,
+    });
+
+    // Gift icon and text
+    const giftText1 = '🎁 A Gift From';
+    const giftText2 = data.purchaserName;
+    const giftText3 = `to ${data.giftRecipientName}`;
+
+    page.drawText(giftText1, {
+      x: width / 2 - (helveticaBold.widthOfTextAtSize(giftText1, 11) / 2),
+      y: giftBannerY + 40,
+      size: 11,
+      font: helveticaBold,
+      color: oceanBlue,
+    });
+
+    page.drawText(giftText2, {
+      x: width / 2 - (timesRomanBold.widthOfTextAtSize(giftText2, 13) / 2),
+      y: giftBannerY + 23,
+      size: 13,
+      font: timesRomanBold,
+      color: darkBlue,
+    });
+
+    page.drawText(giftText3, {
+      x: width / 2 - (timesRomanItalic.widthOfTextAtSize(giftText3, 11) / 2),
+      y: giftBannerY + 8,
+      size: 11,
+      font: timesRomanItalic,
+      color: lightGray,
+    });
+
+    currentY = giftBannerY - 30;
+  }
 
   // "This certifies that" text
   const certifiesText = 'This certifies that';
@@ -303,9 +358,57 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     color: lightGray,
   });
 
+  // ----- GIFT MESSAGE BOX (if it's a gift with a message) -----
+
+  if (data.isGift && data.giftMessage) {
+    currentY = boxY - 30;
+
+    const msgBoxWidth = 450;
+    const msgBoxHeight = 80;
+    const msgBoxX = width / 2 - msgBoxWidth / 2;
+    const msgBoxY = currentY - msgBoxHeight;
+
+    // Draw gift message box
+    page.drawRectangle({
+      x: msgBoxX,
+      y: msgBoxY,
+      width: msgBoxWidth,
+      height: msgBoxHeight,
+      color: rgb(1, 0.973, 0.929), // Very light orange/amber
+      borderColor: rgb(0.957, 0.62, 0.043), // Amber border
+      borderWidth: 2,
+    });
+
+    // Message label
+    let msgY = msgBoxY + msgBoxHeight - 20;
+    page.drawText('💌 Personal Message:', {
+      x: msgBoxX + 20,
+      y: msgY,
+      size: 10,
+      font: helveticaBold,
+      color: rgb(0.573, 0.251, 0.055), // Dark amber
+    });
+
+    // Message text (word wrap for long messages)
+    msgY -= 18;
+    const messageLines = wrapText(data.giftMessage, 65); // ~65 chars per line
+    messageLines.forEach((line) => {
+      page.drawText(`"${line}"`, {
+        x: msgBoxX + 20,
+        y: msgY,
+        size: 9,
+        font: timesRomanItalic,
+        color: rgb(0.471, 0.204, 0.004), // Darker amber
+      });
+      msgY -= 12;
+    });
+
+    currentY = msgBoxY - 20;
+  }
+
   // ----- QR CODE SECTION -----
 
-  currentY = boxY - 40;
+  currentY = currentY || boxY - 40;
 
   // Generate QR code
   const registryUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://coralrefuge.vercel.app'}/registry?id=${data.certificateId}`;
@@ -374,6 +477,28 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   // Serialize the PDF to bytes
   const pdfBytes = await pdfDoc.save();
   return Buffer.from(pdfBytes);
+}
+
+/**
+ * Helper function to wrap text at a specified character limit
+ */
+function wrapText(text: string, maxCharsPerLine: number): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+
+  words.forEach((word) => {
+    const testLine = currentLine ? `${currentLine} ${word}` : word;
+    if (testLine.length <= maxCharsPerLine) {
+      currentLine = testLine;
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  });
+
+  if (currentLine) lines.push(currentLine);
+  return lines;
 }
 
 /**
