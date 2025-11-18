@@ -26,7 +26,16 @@ export async function POST(request: Request) {
     }
 
     // Insert into database
-    const insertData: any = {
+    const insertData: {
+      name: string;
+      email: string;
+      company: string | null;
+      interested_in_partnership: boolean;
+      mpa_id?: string;
+      hectares?: number;
+      amount?: number;
+      interest_types?: string;
+    } = {
       name,
       email,
       company: company || null,

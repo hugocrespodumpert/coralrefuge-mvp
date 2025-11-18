@@ -28,11 +28,11 @@ export default function PublicPortfolioPage() {
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     loadPublicProfile();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [portfolioId]);
 
   const loadPublicProfile = async () => {
@@ -64,8 +64,8 @@ export default function PublicPortfolioPage() {
           },
         ],
       });
-    } catch (err) {
-      setError('Failed to load portfolio');
+    } catch {
+      // Failed to load - will show loading state
     } finally {
       setIsLoading(false);
     }
@@ -103,7 +103,7 @@ export default function PublicPortfolioPage() {
     );
   }
 
-  if (error || !profile) {
+  if (!profile) {
     return (
       <main className="min-h-screen pt-24 pb-12 bg-gray-50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
@@ -112,7 +112,7 @@ export default function PublicPortfolioPage() {
             Portfolio Not Found
           </h1>
           <p className="text-gray-600 mb-6">
-            This portfolio doesn't exist or has been made private.
+            This portfolio doesn&apos;t exist or has been made private.
           </p>
           <Link
             href="/"
@@ -127,7 +127,6 @@ export default function PublicPortfolioPage() {
 
   const totalHectares = profile.sponsorships.reduce((sum, s) => sum + s.hectares, 0);
   const totalCoralColonies = Math.round(totalHectares * 220);
-  const totalSpent = profile.sponsorships.reduce((sum, s) => sum + s.amount, 0);
   const uniqueMPAs = new Set(profile.sponsorships.map(s => s.mpa_id)).size;
   const memberSince = new Date(profile.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -144,7 +143,7 @@ export default function PublicPortfolioPage() {
               <span className="text-5xl">🪸</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              {profile.name}'s Coral Refuge Portfolio
+              {profile.name}&apos;s Coral Refuge Portfolio
             </h1>
             {profile.bio && (
               <p className="text-white/90 max-w-2xl mx-auto">

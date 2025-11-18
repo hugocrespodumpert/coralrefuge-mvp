@@ -17,10 +17,9 @@ export default function Home() {
     if (hasSeenModal) return;
 
     let hasScrolledEnough = false;
-    let timeoutId: NodeJS.Timeout;
 
     // Timer trigger (30 seconds)
-    timeoutId = setTimeout(() => {
+    const timeoutId: NodeJS.Timeout = setTimeout(() => {
       if (!hasSeenModal) {
         setIsWaitlistModalOpen(true);
         setHasSeenModal(true);

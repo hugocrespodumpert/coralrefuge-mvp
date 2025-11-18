@@ -203,7 +203,7 @@ export default function FAQPage() {
               Still have questions?
             </h3>
             <p className="text-gray-600 mb-6">
-              We're here to help! Reach out and we'll get back to you within 24 hours.
+              We&apos;re here to help! Reach out and we&apos;ll get back to you within 24 hours.
             </p>
             <a
               href="mailto:hello@coralrefuge.org"
