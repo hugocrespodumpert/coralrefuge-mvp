@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/Button';
+import PricingSelector, { PricingDetails } from '@/components/PricingSelector';
 
 interface MPA {
   id: string;
@@ -57,6 +58,12 @@ export default function SponsorPage() {
   const searchParams = useSearchParams();
   const [selectedMPA, setSelectedMPA] = useState<MPA | null>(null);
   const [hectares, setHectares] = useState(1);
+  const [pricingDetails, setPricingDetails] = useState<PricingDetails>({
+    type: 'annual',
+    pricePerHectarePerYear: 150,
+    totalYears: 1,
+    totalPrice: 150,
+  });
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -65,9 +72,6 @@ export default function SponsorPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-
-  const pricePerHectare = 50;
-  const totalPrice = hectares * pricePerHectare;
 
   // Pre-select MPA from query parameter (e.g., /sponsor?mpa=ras-mohammed)
   useEffect(() => {
@@ -113,6 +117,9 @@ export default function SponsorPage() {
           mpaName: selectedMPA?.name,
           hectares,
           isAnonymous: formData.isAnonymous,
+          pricingTier: pricingDetails.type,
+          duration: pricingDetails.years,
+          totalPrice: pricingDetails.totalPrice,
         }),
       });
 
@@ -193,25 +200,9 @@ export default function SponsorPage() {
                   </p>
 
                   {selectedMPA?.id === mpa.id ? (
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Number of Hectares (1-50)
-                        </label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="50"
-                          value={hectares}
-                          onChange={(e) => setHectares(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
-                          className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
-                        />
-                      </div>
-                      <div className="bg-turquoise/10 rounded-lg p-4 text-center">
-                        <div className="text-sm text-gray-600">Total Investment</div>
-                        <div className="text-3xl font-bold text-turquoise">${totalPrice}</div>
-                        <div className="text-xs text-gray-500">${pricePerHectare} per hectare</div>
-                      </div>
+                    <div className="bg-turquoise/10 rounded-lg p-4 text-center">
+                      <div className="text-sm text-gray-600 font-semibold">✓ Selected</div>
+                      <div className="text-xs text-gray-500 mt-1">Scroll down to configure your sponsorship</div>
                     </div>
                   ) : (
                     <Button
@@ -238,7 +229,7 @@ export default function SponsorPage() {
                 Complete Your Sponsorship
               </h2>
               <p className="text-gray-600 text-center mb-8">
-                Protect {hectares} hectare{hectares > 1 ? 's' : ''} of {selectedMPA.name}
+                Protecting {selectedMPA.name}
               </p>
 
               {error && (
@@ -248,6 +239,82 @@ export default function SponsorPage() {
               )}
 
               <form id="sponsor-form" onSubmit={handleProceedToPayment} className="space-y-6">
+                {/* Hectare Selection */}
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">Select Hectares</h3>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Number of Hectares (1-50)
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={hectares}
+                    onChange={(e) => setHectares(Math.min(50, Math.max(1, parseInt(e.target.value) || 1)))}
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none text-lg"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">
+                    Choose how many hectares of coral reef you want to protect
+                  </p>
+                </div>
+
+                {/* Pricing Selector */}
+                <div className="bg-white rounded-xl shadow-lg p-6">
+                  <PricingSelector
+                    hectares={hectares}
+                    onPriceChange={(totalPrice, details) => setPricingDetails(details)}
+                  />
+                </div>
+
+                {/* Price Breakdown Summary */}
+                <div className="bg-gradient-to-br from-teal/10 to-ocean-blue/10 rounded-xl shadow-lg p-6">
+                  <h4 className="text-lg font-bold text-gray-800 mb-4">Protection Summary</h4>
+
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">MPA:</span>
+                      <span className="font-medium text-gray-800">{selectedMPA.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Hectares:</span>
+                      <span className="font-medium text-gray-800">{hectares}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Pricing Plan:</span>
+                      <span className="font-medium text-gray-800 capitalize">
+                        {pricingDetails.type === 'multi-year' ? `Multi-Year (${pricingDetails.years} years)` : pricingDetails.type}
+                      </span>
+                    </div>
+                    {pricingDetails.savings && pricingDetails.savings > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span className="font-semibold">You Save:</span>
+                        <span className="font-bold">
+                          ${Math.round(pricingDetails.savings).toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="border-t border-gray-300 mt-4 pt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-bold text-gray-800">Total Amount:</span>
+                      <div className="text-right">
+                        <span className="text-3xl font-bold text-turquoise">
+                          ${Math.round(pricingDetails.totalPrice).toLocaleString()}
+                        </span>
+                        {pricingDetails.type === 'monthly' && (
+                          <div className="text-sm text-gray-600">/month</div>
+                        )}
+                        {pricingDetails.type === 'multi-year' && (
+                          <div className="text-sm text-gray-600">one-time payment</div>
+                        )}
+                        {pricingDetails.type === 'annual' && (
+                          <div className="text-sm text-gray-600">per year</div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Full Name *
@@ -287,21 +354,6 @@ export default function SponsorPage() {
                     className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-turquoise focus:outline-none"
                     placeholder="Your Company"
                   />
-                </div>
-
-                <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
-                  <div className="flex justify-between mb-2">
-                    <span className="font-semibold text-gray-700">Selected MPA:</span>
-                    <span className="text-ocean-deep">{selectedMPA.name}</span>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <span className="font-semibold text-gray-700">Hectares:</span>
-                    <span className="text-ocean-deep">{hectares}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t">
-                    <span className="font-bold text-gray-700">Total:</span>
-                    <span className="font-bold text-turquoise text-xl">${totalPrice}</span>
-                  </div>
                 </div>
 
                 <div className="flex items-start">

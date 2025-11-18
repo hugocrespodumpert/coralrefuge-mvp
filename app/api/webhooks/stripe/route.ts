@@ -145,6 +145,12 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const platformFee = parseInt(metadata.platform_fee);
   const partnerAmount = parseInt(metadata.partner_amount);
 
+  // 🔑 NEW: Pricing tier data
+  const pricingTier = metadata.pricing_tier || 'annual';
+  const commitmentDuration = metadata.commitment_duration ? parseInt(metadata.commitment_duration) : null;
+  const isSubscription = metadata.is_subscription === 'true';
+  const stripeSubscriptionId = session.subscription ? session.subscription as string : null;
+
   console.log('📋 Processing payment for:', {
     sponsorName,
     sponsorEmail,
@@ -164,7 +170,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   console.log('💾 Saving sponsorship to database...');
 
-  // Save to Supabase with Stripe Connect data
+  // Save to Supabase with Stripe Connect data and pricing tier info
   const { data: sponsorship, error: dbError } = await supabase
     .from('sponsorships')
     .insert({
@@ -187,6 +193,12 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       platform_fee_amount: platformFee,
       partner_amount: partnerAmount,
       partner_name: partnerName,
+
+      // 🔑 Pricing tier fields
+      pricing_tier: pricingTier,
+      commitment_duration: commitmentDuration,
+      is_subscription: isSubscription,
+      stripe_subscription_id: stripeSubscriptionId,
     })
     .select()
     .single();
