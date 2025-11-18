@@ -167,13 +167,13 @@ export default function RasMohammedPage() {
           {/* CTA */}
           <div className="bg-gradient-to-br from-ocean-deep to-ocean-blue rounded-2xl p-12 text-center text-white shadow-2xl">
             <div className="inline-block bg-turquoise text-white px-6 py-3 rounded-full text-lg font-bold mb-6">
-              1,200 hectares available • $50/hectare
+              1,200 hectares available • $150/hectare
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Sponsor This Refuge
             </h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Protect Ras Mohammed&apos;s climate-resilient coral reefs and become a guardian of this precious marine ecosystem.
+              Protect Ras Mohammed&apos;s climate-resilient coral reefs and become a sponsor of this precious marine ecosystem.
             </p>
             <Button href="/sponsor" size="lg" className="bg-coral text-white hover:bg-coral/90 text-xl px-12 py-6 rounded-full font-bold shadow-2xl">
               Protect This Reef

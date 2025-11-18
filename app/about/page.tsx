@@ -6,11 +6,11 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            About Coral Refuge
+          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+            We protect the reefs that can survive
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Protecting the coral reefs that can survive climate change
+            Science-backed coral protection for the ocean&apos;s last hope
           </p>
         </div>
       </section>
@@ -21,10 +21,19 @@ export default function AboutPage() {
           <h2 className="text-4xl font-bold text-ocean-deep mb-8 text-center">Our Mission</h2>
           <div className="prose prose-lg max-w-none text-gray-700">
             <p className="text-xl leading-relaxed mb-6">
-              Coral Refuge exists to protect and preserve climate-resilient coral reef refugia—the ocean&apos;s last hope in the face of climate change.
+              Half of all coral reefs have died since 1950. 90% of what remains could be gone by 2050. But the science shows a path forward: <strong>climate refugia.</strong>
             </p>
-            <p className="leading-relaxed mb-6">
-              By connecting individuals and organizations with marine protected areas, we create a global network of guardians dedicated to safeguarding these critical ecosystems. Every hectare protected contributes to biodiversity conservation, coastal protection, and the livelihoods of millions who depend on healthy reefs.
+            <p className="text-lg leading-relaxed mb-6">
+              These pristine reef systems, identified by the 50 Reefs Initiative and mapped through satellite data, have natural advantages that allow them to withstand warming others cannot.
+            </p>
+            <p className="text-lg leading-relaxed mb-6">
+              <strong>But refugia need protection from local stressors: overfishing, pollution, coastal development.</strong>
+            </p>
+            <p className="text-lg leading-relaxed mb-6">
+              Coral Refuge connects individuals and organizations directly to marine protected areas. Every sponsored hectare funds patrol boats, scientific monitoring, and enforcement—turning paper parks into real sanctuaries.
+            </p>
+            <p className="text-xl font-bold text-blue-600">
+              We&apos;re defending what nature already built to survive.
             </p>
           </div>
         </div>
@@ -143,7 +152,7 @@ export default function AboutPage() {
 
           <div className="mt-12 bg-turquoise/10 rounded-2xl p-8 text-center">
             <p className="text-lg text-gray-700 mb-4">
-              <strong>100% of your sponsorship</strong> goes directly to marine protected area management and conservation activities.
+              <strong>80% of your sponsorship</strong> goes directly to marine protected area management and conservation activities.
             </p>
             <p className="text-gray-600">
               We partner with established MPAs and conservation organizations with proven track records in reef protection.
@@ -169,7 +178,7 @@ export default function AboutPage() {
             <div className="bg-gradient-to-br from-turquoise to-ocean-blue text-white rounded-2xl p-10 shadow-xl">
               <h3 className="text-3xl font-bold mb-4">Partner with Local MPAs</h3>
               <p className="text-xl leading-relaxed">
-                100% of funds go to established marine protected areas like <strong>HEPCA</strong> in Egypt.
+                80% of funds go to established marine protected areas like <strong>HEPCA</strong> in Egypt.
                 These are organizations with decades of proven conservation success.
               </p>
             </div>
@@ -209,7 +218,7 @@ export default function AboutPage() {
             </a>
           </div>
           <Button href="/sponsor" size="lg">
-            Become a Guardian Today
+            Become a Sponsor Today
           </Button>
         </div>
       </section>

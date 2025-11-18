@@ -102,7 +102,7 @@ export const mpaFeatures: MPAFeature[] = [
         climateThreat: "Lower risk - cooler water protection",
         protectionLevel: "High - strict regulations, active enforcement"
       },
-      pricePerHectare: 50,
+      pricePerHectare: 150,
       imageUrl: "/images/mpas/ras-mohammed.jpg",
       dataSources: [
         "Boundaries: Digitized from Google Earth satellite imagery",
@@ -180,7 +180,7 @@ export const mpaFeatures: MPAFeature[] = [
         climateThreat: "Moderate - tourism management critical",
         protectionLevel: "High - HEPCA active management and monitoring"
       },
-      pricePerHectare: 50,
+      pricePerHectare: 150,
       imageUrl: "/images/mpas/giftun-islands.jpg",
       dataSources: [
         "Boundaries: Digitized from Mapbox satellite imagery",
@@ -257,7 +257,7 @@ export const mpaFeatures: MPAFeature[] = [
         climateThreat: "Low - size, remoteness, and protection buffer against threats",
         protectionLevel: "High - limited access, active EEAA management"
       },
-      pricePerHectare: 50,
+      pricePerHectare: 150,
       imageUrl: "/images/mpas/wadi-el-gemal.jpg",
       dataSources: [
         "Boundaries: Digitized from Google Earth satellite imagery",
