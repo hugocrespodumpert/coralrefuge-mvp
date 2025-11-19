@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Button from '@/components/Button';
@@ -55,7 +55,7 @@ const mpas: MPA[] = [
   },
 ];
 
-export default function SponsorPage() {
+function SponsorPageContent() {
   const searchParams = useSearchParams();
   const [selectedMPA, setSelectedMPA] = useState<MPA | null>(null);
   const [hectares, setHectares] = useState(1);
@@ -471,5 +471,21 @@ export default function SponsorPage() {
         </section>
       )}
     </main>
+  );
+}
+
+// Main export with Suspense boundary
+export default function SponsorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen pt-24 pb-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-turquoise"></div>
+          <p className="mt-4 text-gray-600">Loading sponsor page...</p>
+        </div>
+      </div>
+    }>
+      <SponsorPageContent />
+    </Suspense>
   );
 }
