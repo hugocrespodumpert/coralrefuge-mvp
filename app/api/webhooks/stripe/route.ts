@@ -249,6 +249,11 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   // Step 4: Send email with certificate
   console.log('📧 Sending certificate email...');
+  console.log('[WEBHOOK] About to call email function for:', {
+    isGift,
+    email: isGift ? sponsorship.gift_recipient_email : sponsorEmail,
+    certificateId,
+  });
   let emailResult;
 
   if (isGift) {

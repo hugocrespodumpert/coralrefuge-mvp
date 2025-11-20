@@ -256,6 +256,14 @@ export async function sendCertificateEmail(
   certificatePdf: Buffer
 ) {
   try {
+    console.log('[EMAIL] About to send certificate to:', email);
+    console.log('[EMAIL] Using sender:', process.env.GMAIL_USER);
+    console.log('[EMAIL] GMAIL_USER exists:', !!process.env.GMAIL_USER);
+    console.log('[EMAIL] GMAIL_APP_PASSWORD exists:', !!process.env.GMAIL_APP_PASSWORD);
+    console.log('[EMAIL] RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    console.log('[EMAIL] Certificate ID:', certificateId);
+    console.log('[EMAIL] PDF size:', certificatePdf.length, 'bytes');
+
     const quarterDate = new Date();
     quarterDate.setMonth(quarterDate.getMonth() + 3);
     const nextReportDate = quarterDate.toLocaleDateString('en-US', {
@@ -398,6 +406,15 @@ export async function sendGiftCertificateEmail(
   certificatePdf: Buffer
 ) {
   try {
+    console.log('[EMAIL] About to send GIFT certificate to:', recipientEmail);
+    console.log('[EMAIL] CC purchaser:', purchaserEmail);
+    console.log('[EMAIL] Using sender:', process.env.GMAIL_USER);
+    console.log('[EMAIL] GMAIL_USER exists:', !!process.env.GMAIL_USER);
+    console.log('[EMAIL] GMAIL_APP_PASSWORD exists:', !!process.env.GMAIL_APP_PASSWORD);
+    console.log('[EMAIL] RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY);
+    console.log('[EMAIL] Certificate ID:', certificateId);
+    console.log('[EMAIL] PDF size:', certificatePdf.length, 'bytes');
+
     const quarterDate = new Date();
     quarterDate.setMonth(quarterDate.getMonth() + 3);
     const nextReportDate = quarterDate.toLocaleDateString('en-US', {
