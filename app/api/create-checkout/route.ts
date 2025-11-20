@@ -104,9 +104,9 @@ export async function POST(request: Request) {
       payment_intent_data: {
         application_fee_amount: fees.platformFee, // 15% stays with platform
         on_behalf_of: 'acct_1SUaGNCQVKGw6RZn',
-      },
-      transfer_data: {
-        destination: 'acct_1SUaGNCQVKGw6RZn',
+        transfer_data: {
+          destination: 'acct_1SUaGNCQVKGw6RZn',
+        },
       },
 
       // Store data for webhook processing
