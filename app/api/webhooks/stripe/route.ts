@@ -255,37 +255,6 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
 
   console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
 
-  // Step 4: Send email with certificate
-  console.log('📧 Sending certificate email...');
-  let emailResult;
-
-  if (isGift) {
-    // Send gift certificate email to recipient with CC to purchaser
-    emailResult = await sendGiftCertificateEmail(
-      sponsorship.gift_recipient_email!,
-      sponsorship.gift_recipient_name!,
-      sponsorship.purchaser_email!,
-      sponsorship.purchaser_name!,
-      mpaName,
-      mpaData.location,
-      hectares,
-      amount,
-      certificateId,
-      sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
-      mpaName,
-      mpaLocation: mpaData.location,
-      hectares,
-      amount,
-      date: formatCertificateDate(now),
-      validUntil: formatCertificateDate(validUntil),
-      // Gift fields
-      isGift,
-      giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
-      purchaserName: isGift ? sponsorship.purchaser_name : undefined,
-      giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
-    });
-    console.log('[CERT] PDF generated successfully');
-
     // Step 4: Send email with certificate
     console.log('📧 Sending certificate email...');
     let emailResult;
