@@ -1,13 +1,7 @@
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Gmail SMTP configuration
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.GMAIL_USER,
-    pass: process.env.GMAIL_APP_PASSWORD, // App-specific password
-  },
-});
+// Resend API configuration
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendWaitlistConfirmation(
   email: string,
@@ -17,8 +11,8 @@ export async function sendWaitlistConfirmation(
   amount: number
 ) {
   try {
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
+    const info = await resend.emails.send({
+      from: 'Coral Refuge <hello@wildreefs.com>',
       to: email,
       subject: 'Welcome to the Coral Refuge Waitlist!',
       html: `
@@ -66,7 +60,7 @@ export async function sendWaitlistConfirmation(
               </div>
               <div class="footer">
                 <p>Built with science. Driven by purpose.</p>
-                <p>${process.env.GMAIL_USER}</p>
+                <p>hello@wildreefs.com</p>
               </div>
             </div>
           </body>
@@ -74,8 +68,8 @@ export async function sendWaitlistConfirmation(
       `,
     });
 
-    console.log('Email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Email sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send email:', error);
     return { success: false, error };
@@ -91,8 +85,8 @@ export async function sendPaymentConfirmation(
   certificateUrl?: string
 ) {
   try {
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
+    const info = await resend.emails.send({
+      from: 'Coral Refuge <hello@wildreefs.com>',
       to: email,
       subject: '🎉 Your Coral Refuge Sponsorship is Confirmed!',
       html: `
@@ -155,7 +149,7 @@ export async function sendPaymentConfirmation(
               </div>
               <div class="footer">
                 <p>Built with science. Driven by purpose.</p>
-                <p>${process.env.GMAIL_USER}</p>
+                <p>hello@wildreefs.com</p>
               </div>
             </div>
           </body>
@@ -163,8 +157,8 @@ export async function sendPaymentConfirmation(
       `,
     });
 
-    console.log('Payment confirmation email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Payment confirmation email sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send payment confirmation email:', error);
     return { success: false, error };
@@ -180,9 +174,9 @@ export async function sendPartnershipNotification(inquiry: {
   message?: string;
 }) {
   try {
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER, // Admin email
+    const info = await resend.emails.send({
+      from: 'Coral Refuge System <system@wildreefs.com>',
+      to: 'hello@wildreefs.com', // Admin email
       subject: `New Partnership Inquiry from ${inquiry.company_name}`,
       html: `
         <!DOCTYPE html>
@@ -237,8 +231,8 @@ export async function sendPartnershipNotification(inquiry: {
       `,
     });
 
-    console.log('Partnership notification sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Partnership notification sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send partnership notification:', error);
     return { success: false, error };
@@ -263,8 +257,8 @@ export async function sendCertificateEmail(
       month: 'long',
     });
 
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
+    const info = await resend.emails.send({
+      from: 'Coral Refuge <hello@wildreefs.com>',
       to: email,
       subject: `Your Ocean Protection Certificate - ${mpaName}`,
       html: `
@@ -361,7 +355,7 @@ export async function sendCertificateEmail(
               <div class="footer">
                 <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Built with science. Driven by purpose.</p>
                 <p style="margin: 5px 0;">Questions? Reply to this email or visit our website</p>
-                <p style="margin: 5px 0; font-size: 12px; color: #999;">${process.env.GMAIL_USER}</p>
+                <p style="margin: 5px 0; font-size: 12px; color: #999;">hello@wildreefs.com</p>
               </div>
             </div>
           </body>
@@ -371,13 +365,12 @@ export async function sendCertificateEmail(
         {
           filename: `Coral-Refuge-Certificate-${certificateId}.pdf`,
           content: certificatePdf,
-          contentType: 'application/pdf',
         },
       ],
     });
 
-    console.log('Certificate email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Certificate email sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send certificate email:', error);
     return { success: false, error };
@@ -405,8 +398,8 @@ export async function sendGiftCertificateEmail(
       month: 'long',
     });
 
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
+    const info = await resend.emails.send({
+      from: 'Coral Refuge <hello@wildreefs.com>',
       to: recipientEmail,
       cc: purchaserEmail, // CC the gift giver
       subject: `🎁 ${purchaserName} has gifted you coral reef protection!`,
@@ -512,7 +505,7 @@ export async function sendGiftCertificateEmail(
               <div class="footer">
                 <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Built with science. Driven by purpose.</p>
                 <p style="margin: 5px 0;">Questions? Reply to this email or visit our website</p>
-                <p style="margin: 5px 0; font-size: 12px; color: #999;">${process.env.GMAIL_USER}</p>
+                <p style="margin: 5px 0; font-size: 12px; color: #999;">hello@wildreefs.com</p>
               </div>
             </div>
           </body>
@@ -522,13 +515,12 @@ export async function sendGiftCertificateEmail(
         {
           filename: `Coral-Refuge-Certificate-${certificateId}.pdf`,
           content: certificatePdf,
-          contentType: 'application/pdf',
         },
       ],
     });
 
-    console.log('Gift certificate email sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Gift certificate email sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send gift certificate email:', error);
     return { success: false, error };
@@ -550,9 +542,9 @@ export async function sendAdminNotification(
           .join('')
       : '';
 
-    const info = await transporter.sendMail({
-      from: `"Coral Refuge System" <${process.env.GMAIL_USER}>`,
-      to: process.env.GMAIL_USER,
+    const info = await resend.emails.send({
+      from: 'Coral Refuge System <system@wildreefs.com>',
+      to: 'hello@wildreefs.com',
       subject: subject,
       html: `
         <!DOCTYPE html>
@@ -583,8 +575,8 @@ export async function sendAdminNotification(
       `,
     });
 
-    console.log('Admin notification sent:', info.messageId);
-    return { success: true, messageId: info.messageId };
+    console.log('Admin notification sent:', info.data?.id);
+    return { success: true, messageId: info.data?.id };
   } catch (error) {
     console.error('Failed to send admin notification:', error);
     return { success: false, error };
