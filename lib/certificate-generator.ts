@@ -18,9 +18,49 @@ export interface CertificateData {
 }
 
 /**
+ * Sanitizes text for PDF generation by removing emojis and special Unicode characters
+ * that are not supported by WinAnsi encoding
+ */
+function sanitizeForPDF(text: string): string {
+  return text
+    // Remove emojis (emoticons, symbols, pictographs, etc.)
+    // Using a comprehensive emoji regex pattern compatible with ES5
+    .replace(/[\u2600-\u26FF]/g, '')   // Miscellaneous symbols
+    .replace(/[\u2700-\u27BF]/g, '')   // Dingbats
+    .replace(/[\uD800-\uDFFF]/g, '')   // Surrogate pairs (covers most emojis)
+    .replace(/[\u2300-\u23FF]/g, '')   // Miscellaneous technical
+    .replace(/[\uFE00-\uFEFF]/g, '')   // Variation selectors
+    .replace(/[\u{1F000}-\u{1F9FF}]/gu, '') // Emoticons and symbols (ES6 Unicode escapes)
+    .replace(/[\u{1F300}-\u{1F5FF}]/gu, '') // Symbols and pictographs
+    .replace(/[\u{1F600}-\u{1F64F}]/gu, '') // Emoticons
+    .replace(/[\u{1F680}-\u{1F6FF}]/gu, '') // Transport and map symbols
+    .replace(/[\u{1F900}-\u{1F9FF}]/gu, '') // Supplemental symbols
+    // Normalize and remove combining marks
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    // Trim any extra whitespace
+    .trim();
+}
+
+/**
  * Generates a beautiful PDF certificate for coral reef sponsorship
  */
 export async function generateCertificate(data: CertificateData): Promise<Buffer> {
+  // Sanitize all text fields to remove emojis and special Unicode characters
+  // that are not supported by WinAnsi encoding
+  const sanitizedData: CertificateData = {
+    ...data,
+    sponsorName: sanitizeForPDF(data.sponsorName),
+    mpaName: sanitizeForPDF(data.mpaName),
+    mpaLocation: sanitizeForPDF(data.mpaLocation),
+    giftRecipientName: data.giftRecipientName ? sanitizeForPDF(data.giftRecipientName) : undefined,
+    purchaserName: data.purchaserName ? sanitizeForPDF(data.purchaserName) : undefined,
+    giftMessage: data.giftMessage ? sanitizeForPDF(data.giftMessage) : undefined,
+  };
+
+  // Use sanitized data for all subsequent operations
+  const certificateData = sanitizedData;
+
   // Create a new PDF document
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]); // A4 size in points
@@ -102,20 +142,14 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     color: oceanBlue,
   });
 
-  // Coral emoji/symbol alternative
-  const coralText = '🪸';
-  page.drawText(coralText, {
-    x: width / 2 - 15,
-    y: headerY + 15,
-    size: 30,
-  });
+  // Removed coral emoji to fix WinAnsi encoding issues
 
   // ----- MAIN CONTENT SECTION -----
 
   let currentY = headerY - 50;
 
   // 🎁 GIFT BANNER (if it's a gift)
-  if (data.isGift && data.purchaserName && data.giftRecipientName) {
+  if (certificateData.isGift && certificateData.purchaserName && certificateData.giftRecipientName) {
     const giftBannerHeight = 60;
     const giftBannerWidth = width - 2 * margin - 80;
     const giftBannerX = width / 2 - giftBannerWidth / 2;
@@ -132,10 +166,10 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
       borderWidth: 2,
     });
 
-    // Gift icon and text
-    const giftText1 = '🎁 A Gift From';
-    const giftText2 = data.purchaserName;
-    const giftText3 = `to ${data.giftRecipientName}`;
+    // Gift banner text (emoji removed for WinAnsi compatibility)
+    const giftText1 = 'A Gift From';
+    const giftText2 = certificateData.purchaserName;
+    const giftText3 = `to ${certificateData.giftRecipientName}`;
 
     page.drawText(giftText1, {
       x: width / 2 - (helveticaBold.widthOfTextAtSize(giftText1, 11) / 2),
@@ -178,8 +212,8 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
 
   // Sponsor name (large and prominent)
   const sponsorNameSize = 28;
-  const sponsorNameWidth = timesRomanBold.widthOfTextAtSize(data.sponsorName, sponsorNameSize);
-  page.drawText(data.sponsorName, {
+  const sponsorNameWidth = timesRomanBold.widthOfTextAtSize(certificateData.sponsorName, sponsorNameSize);
+  page.drawText(certificateData.sponsorName, {
     x: width / 2 - sponsorNameWidth / 2,
     y: currentY,
     size: sponsorNameSize,
@@ -198,7 +232,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   currentY -= 50;
 
   // Main description
-  const descLine1 = `has protected ${data.hectares} hectare${data.hectares > 1 ? 's' : ''} of climate-resilient coral reefs in`;
+  const descLine1 = `has protected ${certificateData.hectares} hectare${certificateData.hectares > 1 ? 's' : ''} of climate-resilient coral reefs in`;
   page.drawText(descLine1, {
     x: width / 2 - (timesRoman.widthOfTextAtSize(descLine1, 13) / 2),
     y: currentY,
@@ -211,8 +245,8 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
 
   // MPA Name (prominent)
   const mpaNameSize = 20;
-  page.drawText(data.mpaName, {
-    x: width / 2 - (timesRomanBold.widthOfTextAtSize(data.mpaName, mpaNameSize) / 2),
+  page.drawText(certificateData.mpaName, {
+    x: width / 2 - (timesRomanBold.widthOfTextAtSize(certificateData.mpaName, mpaNameSize) / 2),
     y: currentY,
     size: mpaNameSize,
     font: timesRomanBold,
@@ -222,8 +256,8 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   currentY -= 25;
 
   // MPA Location
-  page.drawText(data.mpaLocation, {
-    x: width / 2 - (timesRomanItalic.widthOfTextAtSize(data.mpaLocation, 12) / 2),
+  page.drawText(certificateData.mpaLocation, {
+    x: width / 2 - (timesRomanItalic.widthOfTextAtSize(certificateData.mpaLocation, 12) / 2),
     y: currentY,
     size: 12,
     font: timesRomanItalic,
@@ -264,7 +298,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     font: helvetica,
     color: lightGray,
   });
-  page.drawText(data.certificateId, {
+  page.drawText(certificateData.certificateId, {
     x: detailX + 90,
     y: detailY,
     size: valueSize,
@@ -279,7 +313,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     font: helvetica,
     color: lightGray,
   });
-  page.drawText(`${data.hectares} hectare${data.hectares > 1 ? 's' : ''}`, {
+  page.drawText(`${certificateData.hectares} hectare${certificateData.hectares > 1 ? 's' : ''}`, {
     x: detailX + 250 + 90,
     y: detailY,
     size: valueSize,
@@ -297,7 +331,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     font: helvetica,
     color: lightGray,
   });
-  page.drawText(data.date, {
+  page.drawText(certificateData.date, {
     x: detailX + 90,
     y: detailY,
     size: valueSize,
@@ -312,7 +346,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     font: helvetica,
     color: lightGray,
   });
-  page.drawText(data.validUntil, {
+  page.drawText(certificateData.validUntil, {
     x: detailX + 250 + 90,
     y: detailY,
     size: valueSize,
@@ -330,7 +364,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
     font: helvetica,
     color: lightGray,
   });
-  page.drawText(`$${data.amount} USD`, {
+  page.drawText(`$${certificateData.amount} USD`, {
     x: detailX + 90,
     y: detailY,
     size: valueSize,
@@ -360,7 +394,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
 
   // ----- GIFT MESSAGE BOX (if it's a gift with a message) -----
 
-  if (data.isGift && data.giftMessage) {
+  if (certificateData.isGift && certificateData.giftMessage) {
     currentY = boxY - 30;
 
     const msgBoxWidth = 450;
@@ -379,9 +413,9 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
       borderWidth: 2,
     });
 
-    // Message label
+    // Message label (emoji removed for WinAnsi compatibility)
     let msgY = msgBoxY + msgBoxHeight - 20;
-    page.drawText('💌 Personal Message:', {
+    page.drawText('Personal Message:', {
       x: msgBoxX + 20,
       y: msgY,
       size: 10,
@@ -391,7 +425,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
 
     // Message text (word wrap for long messages)
     msgY -= 18;
-    const messageLines = wrapText(data.giftMessage, 65); // ~65 chars per line
+    const messageLines = wrapText(certificateData.giftMessage, 65); // ~65 chars per line
     messageLines.forEach((line) => {
       page.drawText(`"${line}"`, {
         x: msgBoxX + 20,
@@ -411,7 +445,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   currentY = currentY || boxY - 40;
 
   // Generate QR code
-  const registryUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://coralrefuge.vercel.app'}/registry?id=${data.certificateId}`;
+  const registryUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://coralrefuge.vercel.app'}/registry?id=${certificateData.certificateId}`;
   const qrCodeDataUrl = await QRCode.toDataURL(registryUrl, {
     width: 100,
     margin: 1,
