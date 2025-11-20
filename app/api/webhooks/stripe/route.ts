@@ -229,68 +229,74 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const validUntil = new Date(now);
   validUntil.setFullYear(validUntil.getFullYear() + 10);
 
-  const certificatePdf = await generateCertificate({
-    certificateId,
-    sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
-    mpaName,
-    mpaLocation: mpaData.location,
-    hectares,
-    amount,
-    date: formatCertificateDate(now),
-    validUntil: formatCertificateDate(validUntil),
-    // Gift fields
-    isGift,
-    giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
-    purchaserName: isGift ? sponsorship.purchaser_name : undefined,
-    giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
-  });
-
-  console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
-
-  // Step 4: Send email with certificate
-  console.log('📧 Sending certificate email...');
-  let emailResult;
-
-  if (isGift) {
-    // Send gift certificate email to recipient with CC to purchaser
-    emailResult = await sendGiftCertificateEmail(
-      sponsorship.gift_recipient_email!,
-      sponsorship.gift_recipient_name!,
-      sponsorship.purchaser_email!,
-      sponsorship.purchaser_name!,
+  try {
+    console.log('[CERT] Starting generation for:', certificateId);
+    const certificatePdf = await generateCertificate({
+      certificateId,
+      sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
       mpaName,
-      mpaData.location,
+      mpaLocation: mpaData.location,
       hectares,
       amount,
-      certificateId,
-      sponsorship.gift_message,
-      certificatePdf
-    );
-  } else {
-    // Send regular certificate email
-    emailResult = await sendCertificateEmail(
-      sponsorEmail,
-      sponsorName,
-      mpaName,
-      mpaData.location,
-      hectares,
-      amount,
-      certificateId,
-      certificatePdf
-    );
-  }
+      date: formatCertificateDate(now),
+      validUntil: formatCertificateDate(validUntil),
+      // Gift fields
+      isGift,
+      giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
+      purchaserName: isGift ? sponsorship.purchaser_name : undefined,
+      giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
+    });
+    console.log('[CERT] PDF generated successfully');
 
-  if (emailResult.success) {
-    console.log('✅ Certificate email sent successfully');
+    // Step 4: Send email with certificate
+    console.log('📧 Sending certificate email...');
+    let emailResult;
 
-    // Update certificate status to 'sent'
-    await supabase
-      .from('sponsorships')
-      .update({ certificate_status: 'sent' })
-      .eq('id', sponsorship.id);
-  } else {
-    console.error('❌ Failed to send certificate email:', emailResult.error);
-    throw new Error('Failed to send certificate email');
+    if (isGift) {
+      // Send gift certificate email to recipient with CC to purchaser
+      emailResult = await sendGiftCertificateEmail(
+        sponsorship.gift_recipient_email!,
+        sponsorship.gift_recipient_name!,
+        sponsorship.purchaser_email!,
+        sponsorship.purchaser_name!,
+        mpaName,
+        mpaData.location,
+        hectares,
+        amount,
+        certificateId,
+        sponsorship.gift_message,
+        certificatePdf
+      );
+    } else {
+      // Send regular certificate email
+      emailResult = await sendCertificateEmail(
+        sponsorEmail,
+        sponsorName,
+        mpaName,
+        mpaData.location,
+        hectares,
+        amount,
+        certificateId,
+        certificatePdf
+      );
+    }
+    console.log('[CERT] Email sent successfully');
+
+    if (emailResult.success) {
+      console.log('✅ Certificate email sent successfully');
+
+      // Update certificate status to 'sent'
+      await supabase
+        .from('sponsorships')
+        .update({ certificate_status: 'sent' })
+        .eq('id', sponsorship.id);
+    } else {
+      console.error('❌ Failed to send certificate email:', emailResult.error);
+      throw new Error('Failed to send certificate email');
+    }
+  } catch (error) {
+    console.error('[CERT] Failed:', error);
+    throw error;
   }
 
   // Step 5: Notify admin of new sponsorship

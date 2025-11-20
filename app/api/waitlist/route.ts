@@ -1,67 +1,28 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { sendWaitlistConfirmation, sendAdminNotification } from '@/lib/email';
+import { sendAdminNotification } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, company, mpa, hectares, amount, interestedInPartnership, interest_types } = body;
-
-    // Support both old (sponsorship waitlist) and new (general waitlist) formats
-    const isGeneralWaitlist = !mpa && !hectares && !amount;
+    const { name, email, interest_types } = body;
 
     // Validate required fields
-    if (!name || !email) {
+    if (!email) {
       return NextResponse.json(
-        { error: 'Name and email are required' },
+        { error: 'Email is required' },
         { status: 400 }
       );
     }
 
-    if (!isGeneralWaitlist && (!mpa || !hectares || !amount)) {
-      return NextResponse.json(
-        { error: 'Missing required sponsorship fields' },
-        { status: 400 }
-      );
-    }
-
-    // Insert into database
-    const insertData: {
-      name: string;
-      email: string;
-      company: string | null;
-      interested_in_partnership: boolean;
-      mpa_id?: string;
-      hectares?: number;
-      amount?: number;
-      interest_types?: string;
-    } = {
-      name,
-      email,
-      company: company || null,
-      interested_in_partnership: interestedInPartnership || false,
-    };
-
-    // Add sponsorship fields if provided
-    if (!isGeneralWaitlist) {
-      insertData.mpa_id = mpa;
-      insertData.hectares = hectares;
-      insertData.amount = amount;
-    } else {
-      // For general waitlist, use default values
-      insertData.mpa_id = 'general';
-      insertData.hectares = 0;
-      insertData.amount = 0;
-    }
-
-    // Add interest types if provided (stored as JSON array or string)
-    if (interest_types && Array.isArray(interest_types)) {
-      insertData.interest_types = interest_types.join(',');
-    }
-
+    // Insert into database - only use columns that exist in the table
     const { data, error } = await supabase
       .from('waitlist_signups')
-      .insert(insertData)
+      .insert({
+        email: email,
+        name: name || null,
+        interest_types: interest_types || null,
+      })
       .select()
       .single();
 
@@ -87,26 +48,10 @@ export async function POST(request: Request) {
       {
         'Email': email,
         'Name': name || 'Not provided',
-        'Interest': interest_types?.join(', ') || 'General',
+        'Interest': interest_types || 'General',
         'Date': new Date().toLocaleString(),
       }
     );
-
-    // Send confirmation email (only for sponsorship waitlist for now)
-    if (!isGeneralWaitlist) {
-      const emailResult = await sendWaitlistConfirmation(
-        email,
-        name,
-        mpa,
-        hectares,
-        amount
-      );
-
-      if (!emailResult.success) {
-        console.error('Email sending failed:', emailResult.error);
-        // Don't fail the request if email fails
-      }
-    }
 
     return NextResponse.json({
       success: true,
