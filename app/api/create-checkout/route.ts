@@ -103,8 +103,8 @@ export async function POST(request: Request) {
       // 🔑 STRIPE CONNECT: Automatic 15/85 split
       payment_intent_data: {
         application_fee_amount: fees.platformFee, // 15% stays with platform
+        on_behalf_of: 'acct_1SUaGNCQVKGw6RZn',
       },
-      on_behalf_of: 'acct_1SUaGNCQVKGw6RZn',
       transfer_data: {
         destination: 'acct_1SUaGNCQVKGw6RZn',
       },
