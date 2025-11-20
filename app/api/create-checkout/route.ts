@@ -103,14 +103,10 @@ export async function POST(request: Request) {
       // 🔑 STRIPE CONNECT: Automatic 15/85 split
       payment_intent_data: {
         application_fee_amount: fees.platformFee, // 15% stays with platform
-        transfer_data: {
-          destination: partnerAccount.stripe_account_id, // 85% goes to partner (HEPCA)
-        },
-        metadata: {
-          mpaId,
-          mpaName,
-          partner_name: partnerAccount.partner_name,
-        },
+      },
+      on_behalf_of: 'acct_1SUaGNCQVKGw6RZn',
+      transfer_data: {
+        destination: 'acct_1SUaGNCQVKGw6RZn',
       },
 
       // Store data for webhook processing
@@ -123,8 +119,8 @@ export async function POST(request: Request) {
         hectares: hectares.toString(),
         amount: amount.toString(),
         isAnonymous: isAnonymous ? 'true' : 'false',
-        partner_name: partnerAccount.partner_name,
-        partner_account_id: partnerAccount.stripe_account_id,
+        partner_account_id: 'acct_1SUaGNCQVKGw6RZn',
+        partner_name: 'Test HEPCA',
         platform_fee: fees.platformFee.toString(),
         partner_amount: fees.partnerAmount.toString(),
         // Gift metadata
