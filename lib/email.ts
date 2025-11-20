@@ -255,6 +255,12 @@ export async function sendCertificateEmail(
   certificateId: string,
   certificatePdf: Buffer
 ) {
+  console.log('📧 [EMAIL] Starting certificate email send...');
+  console.log('📧 [EMAIL] To:', email);
+  console.log('📧 [EMAIL] From:', process.env.GMAIL_USER);
+  console.log('📧 [EMAIL] Certificate ID:', certificateId);
+  console.log('📧 [EMAIL] PDF size:', certificatePdf.length, 'bytes');
+
   try {
     const quarterDate = new Date();
     quarterDate.setMonth(quarterDate.getMonth() + 3);
@@ -263,6 +269,7 @@ export async function sendCertificateEmail(
       month: 'long',
     });
 
+    console.log('📧 [EMAIL] Calling transporter.sendMail...');
     const info = await transporter.sendMail({
       from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
       to: email,
@@ -376,10 +383,17 @@ export async function sendCertificateEmail(
       ],
     });
 
-    console.log('Certificate email sent:', info.messageId);
+    console.log('📧 [EMAIL] ✅ Certificate email sent successfully!');
+    console.log('📧 [EMAIL] Message ID:', info.messageId);
+    console.log('📧 [EMAIL] Response:', info.response);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Failed to send certificate email:', error);
+    console.error('📧 [EMAIL] ❌ Failed to send certificate email');
+    console.error('📧 [EMAIL] Error:', error);
+    if (error instanceof Error) {
+      console.error('📧 [EMAIL] Error message:', error.message);
+      console.error('📧 [EMAIL] Error stack:', error.stack);
+    }
     return { success: false, error };
   }
 }
@@ -397,6 +411,13 @@ export async function sendGiftCertificateEmail(
   giftMessage: string | null,
   certificatePdf: Buffer
 ) {
+  console.log('📧 [EMAIL] Starting GIFT certificate email send...');
+  console.log('📧 [EMAIL] To (recipient):', recipientEmail);
+  console.log('📧 [EMAIL] CC (purchaser):', purchaserEmail);
+  console.log('📧 [EMAIL] From:', process.env.GMAIL_USER);
+  console.log('📧 [EMAIL] Certificate ID:', certificateId);
+  console.log('📧 [EMAIL] PDF size:', certificatePdf.length, 'bytes');
+
   try {
     const quarterDate = new Date();
     quarterDate.setMonth(quarterDate.getMonth() + 3);
@@ -405,6 +426,7 @@ export async function sendGiftCertificateEmail(
       month: 'long',
     });
 
+    console.log('📧 [EMAIL] Calling transporter.sendMail for gift certificate...');
     const info = await transporter.sendMail({
       from: `"Coral Refuge" <${process.env.GMAIL_USER}>`,
       to: recipientEmail,
@@ -527,10 +549,17 @@ export async function sendGiftCertificateEmail(
       ],
     });
 
-    console.log('Gift certificate email sent:', info.messageId);
+    console.log('📧 [EMAIL] ✅ Gift certificate email sent successfully!');
+    console.log('📧 [EMAIL] Message ID:', info.messageId);
+    console.log('📧 [EMAIL] Response:', info.response);
     return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Failed to send gift certificate email:', error);
+    console.error('📧 [EMAIL] ❌ Failed to send gift certificate email');
+    console.error('📧 [EMAIL] Error:', error);
+    if (error instanceof Error) {
+      console.error('📧 [EMAIL] Error message:', error.message);
+      console.error('📧 [EMAIL] Error stack:', error.stack);
+    }
     return { success: false, error };
   }
 }

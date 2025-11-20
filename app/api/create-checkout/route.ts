@@ -101,6 +101,9 @@ export async function POST(request: Request) {
       mode: 'payment',
 
       // 🔑 STRIPE CONNECT: Automatic 15/85 split
+      // TODO: Re-enable Connect when HEPCA account created
+      // Temporarily disabled to fix "No such destination" error
+      /*
       payment_intent_data: {
         application_fee_amount: fees.platformFee, // 15% stays with platform
         transfer_data: {
@@ -112,6 +115,7 @@ export async function POST(request: Request) {
           partner_name: partnerAccount.partner_name,
         },
       },
+      */
 
       // Store data for webhook processing
       metadata: {
@@ -145,6 +149,8 @@ export async function POST(request: Request) {
     console.log('✅ Stripe session created successfully:', {
       sessionId: session.id,
       url: session.url,
+      mode: 'payment',
+      stripeConnect: 'DISABLED (TODO: Re-enable when HEPCA account ready)',
     });
 
     return NextResponse.json({

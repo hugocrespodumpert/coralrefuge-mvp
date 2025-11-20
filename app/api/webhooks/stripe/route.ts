@@ -63,12 +63,19 @@ export async function POST(req: Request) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
 
+    console.log('========================================');
+    console.log('🎉 STRIPE WEBHOOK: checkout.session.completed');
     console.log('✅ Payment completed for session:', session.id);
-    console.log('📦 Session metadata:', session.metadata);
+    console.log('📧 Customer email:', session.customer_email);
+    console.log('💰 Amount total:', session.amount_total ? `$${session.amount_total / 100}` : 'N/A');
+    console.log('📦 Session metadata:', JSON.stringify(session.metadata, null, 2));
+    console.log('========================================');
 
     try {
       await handleSuccessfulPayment(session);
-      console.log('✅ Payment processing completed successfully');
+      console.log('========================================');
+      console.log('✅ PAYMENT PROCESSING COMPLETED SUCCESSFULLY');
+      console.log('========================================');
     } catch (error) {
       console.error('❌ ERROR processing successful payment:', error);
       if (error instanceof Error) {
@@ -220,16 +227,18 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   console.log('✅ Sponsorship saved to database:', sponsorship.id);
 
   // Generate certificate ID from sponsorship ID
-  const certificateId = `CR-${mpaId.toUpperCase().substring(0, 3)}-${sponsorship.id.substring(0, 8).toUpperCase()}`;
+  // Format: WR-RAS-XXXXX (WR = Wild Reefs, RAS = MPA prefix, 8-char UUID)
+  const certificateId = `WR-${mpaId.toUpperCase().substring(0, 3)}-${sponsorship.id.substring(0, 8).toUpperCase()}`;
   console.log('📜 Generated certificate ID:', certificateId);
 
   // Step 3: Generate PDF Certificate
-  console.log('📄 Generating PDF certificate...');
+  console.log('========================================');
+  console.log('📄 STEP 3: Generating PDF certificate...');
   const now = new Date();
   const validUntil = new Date(now);
   validUntil.setFullYear(validUntil.getFullYear() + 10);
 
-  const certificatePdf = await generateCertificate({
+  const certificateData = {
     certificateId,
     sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
     mpaName,
@@ -243,16 +252,31 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
     purchaserName: isGift ? sponsorship.purchaser_name : undefined,
     giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
-  });
+  };
 
-  console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
+  console.log('📋 Certificate data:', JSON.stringify(certificateData, null, 2));
+
+  const certificatePdf = await generateCertificate(certificateData);
+
+  console.log('✅ Certificate PDF generated successfully');
+  console.log('📊 PDF size:', certificatePdf.length, 'bytes');
+  console.log('========================================');
 
   // Step 4: Send email with certificate
-  console.log('📧 Sending certificate email...');
+  console.log('========================================');
+  console.log('📧 STEP 4: Sending certificate email...');
+  console.log('📧 Email type:', isGift ? 'Gift Certificate' : 'Regular Certificate');
+  console.log('📧 Recipient email:', isGift ? sponsorship.gift_recipient_email : sponsorEmail);
+  if (isGift) {
+    console.log('📧 CC to purchaser:', sponsorship.purchaser_email);
+  }
+  console.log('========================================');
+
   let emailResult;
 
   if (isGift) {
     // Send gift certificate email to recipient with CC to purchaser
+    console.log('🎁 Sending gift certificate email...');
     emailResult = await sendGiftCertificateEmail(
       sponsorship.gift_recipient_email!,
       sponsorship.gift_recipient_name!,
@@ -268,6 +292,7 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
     );
   } else {
     // Send regular certificate email
+    console.log('📧 Sending regular certificate email...');
     emailResult = await sendCertificateEmail(
       sponsorEmail,
       sponsorName,
@@ -281,16 +306,67 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   }
 
   if (emailResult.success) {
-    console.log('✅ Certificate email sent successfully');
+    console.log('========================================');
+    console.log('✅ CERTIFICATE EMAIL SENT SUCCESSFULLY');
+    console.log('📧 Message ID:', emailResult.messageId);
+    console.log('========================================');
 
     // Update certificate status to 'sent'
-    await supabase
+    const { error: updateError } = await supabase
       .from('sponsorships')
       .update({ certificate_status: 'sent' })
       .eq('id', sponsorship.id);
+
+    if (updateError) {
+      console.error('⚠️  Warning: Failed to update certificate status:', updateError);
+    } else {
+      console.log('✅ Certificate status updated to "sent"');
+    }
   } else {
-    console.error('❌ Failed to send certificate email:', emailResult.error);
-    throw new Error('Failed to send certificate email');
+    console.error('========================================');
+    console.error('❌ FAILED TO SEND CERTIFICATE EMAIL');
+    console.error('Error details:', emailResult.error);
+    console.error('========================================');
+
+    // Retry once after 2 seconds
+    console.log('🔄 Retrying email send in 2 seconds...');
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    const retryResult = isGift
+      ? await sendGiftCertificateEmail(
+          sponsorship.gift_recipient_email!,
+          sponsorship.gift_recipient_name!,
+          sponsorship.purchaser_email!,
+          sponsorship.purchaser_name!,
+          mpaName,
+          mpaData.location,
+          hectares,
+          amount,
+          certificateId,
+          sponsorship.gift_message,
+          certificatePdf
+        )
+      : await sendCertificateEmail(
+          sponsorEmail,
+          sponsorName,
+          mpaName,
+          mpaData.location,
+          hectares,
+          amount,
+          certificateId,
+          certificatePdf
+        );
+
+    if (retryResult.success) {
+      console.log('✅ Email sent successfully on retry');
+      await supabase
+        .from('sponsorships')
+        .update({ certificate_status: 'sent' })
+        .eq('id', sponsorship.id);
+    } else {
+      console.error('❌ Email failed on retry as well');
+      throw new Error(`Failed to send certificate email after retry: ${retryResult.error}`);
+    }
   }
 
   // Step 5: Notify admin of new sponsorship
