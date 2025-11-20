@@ -301,10 +301,6 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
       console.error('❌ Failed to send certificate email:', emailResult.error);
       throw new Error('Failed to send certificate email');
     }
-  } catch (error) {
-    console.error('[CERT] Failed:', error);
-    throw error;
-  }
 
   // Step 5: Notify admin of new sponsorship
   console.log('📬 Sending admin notification...');
