@@ -544,7 +544,7 @@ export async function sendAdminNotification(
 
     const info = await resend.emails.send({
       from: 'Coral Refuge System <system@wildreefs.com>',
-      to: 'hello@wildreefs.com',
+      to: 'hugocrespodumpert@gmail.com',
       subject: subject,
       html: `
         <!DOCTYPE html>

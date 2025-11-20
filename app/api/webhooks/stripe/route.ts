@@ -229,21 +229,29 @@ async function handleSuccessfulPayment(session: Stripe.Checkout.Session) {
   const validUntil = new Date(now);
   validUntil.setFullYear(validUntil.getFullYear() + 10);
 
-  const certificatePdf = await generateCertificate({
-    certificateId,
-    sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
-    mpaName,
-    mpaLocation: mpaData.location,
-    hectares,
-    amount,
-    date: formatCertificateDate(now),
-    validUntil: formatCertificateDate(validUntil),
-    // Gift fields
-    isGift,
-    giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
-    purchaserName: isGift ? sponsorship.purchaser_name : undefined,
-    giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
-  });
+  let certificatePdf: Buffer;
+  try {
+    console.log('[CERT] Generating PDF for:', sponsorship.id);
+    certificatePdf = await generateCertificate({
+      certificateId,
+      sponsorName: isGift ? sponsorship.gift_recipient_name! : sponsorName,
+      mpaName,
+      mpaLocation: mpaData.location,
+      hectares,
+      amount,
+      date: formatCertificateDate(now),
+      validUntil: formatCertificateDate(validUntil),
+      // Gift fields
+      isGift,
+      giftRecipientName: isGift ? sponsorship.gift_recipient_name : undefined,
+      purchaserName: isGift ? sponsorship.purchaser_name : undefined,
+      giftMessage: isGift && sponsorship.gift_message ? sponsorship.gift_message : undefined,
+    });
+    console.log('[CERT] PDF generated, size:', certificatePdf.length);
+  } catch (error) {
+    console.error('[CERT] Generation failed:', error);
+    throw error;
+  }
 
   console.log('✅ Certificate PDF generated, size:', certificatePdf.length, 'bytes');
 
