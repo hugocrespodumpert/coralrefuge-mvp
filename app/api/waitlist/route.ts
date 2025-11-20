@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { sendWaitlistConfirmation } from '@/lib/email';
+import { sendWaitlistConfirmation, sendAdminNotification } from '@/lib/email';
 
 export async function POST(request: Request) {
   try {
@@ -79,6 +79,18 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Send admin notification
+    await sendAdminNotification(
+      '📧 New Waitlist Signup',
+      `Someone joined the waitlist!`,
+      {
+        'Email': email,
+        'Name': name || 'Not provided',
+        'Interest': interest_types?.join(', ') || 'General',
+        'Date': new Date().toLocaleString(),
+      }
+    );
 
     // Send confirmation email (only for sponsorship waitlist for now)
     if (!isGeneralWaitlist) {
