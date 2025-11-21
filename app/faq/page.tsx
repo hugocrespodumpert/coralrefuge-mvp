@@ -98,7 +98,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'Can my company sponsor reefs?',
-        answer: 'Yes! We offer corporate partnerships including revenue-share integration, flat commitments, and employee engagement programs. See our Conservation as a Service page or contact partnerships@coralrefuge.org',
+        answer: 'Yes! We offer corporate partnerships including revenue-share integration, flat commitments, and employee engagement programs. See our Conservation as a Service page or contact partnerships@wildreefs.com',
       },
       {
         question: 'I\'m a dive operator/resort. How can we partner?',
@@ -119,7 +119,7 @@ const faqData: FAQCategory[] = [
       },
       {
         question: 'Do you have an API for corporate integration?',
-        answer: 'Coming soon! Email partnerships@coralrefuge.org if interested in revenue-share integration.',
+        answer: 'Coming soon! Email partnerships@wildreefs.com if interested in revenue-share integration.',
       },
     ],
   },
@@ -128,7 +128,7 @@ const faqData: FAQCategory[] = [
     items: [
       {
         question: 'How do I get in touch?',
-        answer: 'Email hello@coralrefuge.org or use our contact form. We respond within 24 hours.',
+        answer: 'Email hello@wildreefs.com or use our contact form. We respond within 24 hours.',
       },
     ],
   },
@@ -206,7 +206,7 @@ export default function FAQPage() {
               We&apos;re here to help! Reach out and we&apos;ll get back to you within 24 hours.
             </p>
             <a
-              href="mailto:hello@coralrefuge.org"
+              href="mailto:hello@wildreefs.com"
               className="inline-block bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Contact Us

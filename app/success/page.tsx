@@ -165,7 +165,7 @@ function SuccessContent() {
           <div className="flex justify-center gap-4">
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                "I just became a Sponsor of Coral Refuges! 🪸🌊 Protecting climate-resilient coral reefs one hectare at a time. Join me at coralrefuge.org"
+                "I just became a Reef Sponsor! Protecting climate-resilient coral reefs one hectare at a time. Join me at wildreefs.com"
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -177,7 +177,7 @@ function SuccessContent() {
             </a>
             <a
               href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-                process.env.NEXT_PUBLIC_BASE_URL || 'https://coralrefuge.org'
+                process.env.NEXT_PUBLIC_BASE_URL || 'https://wildreefs.com'
               )}`}
               target="_blank"
               rel="noopener noreferrer"

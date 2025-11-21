@@ -121,7 +121,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   });
 
   // Title
-  const titleText = 'CERTIFICATE OF OCEAN GUARDIANSHIP';
+  const titleText = 'CERTIFICATE OF OCEAN SPONSORSHIP';
   const titleSize = 24;
   page.drawText(titleText, {
     x: width / 2 - (timesRomanBold.widthOfTextAtSize(titleText, titleSize) / 2),
@@ -445,7 +445,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   currentY = currentY || boxY - 40;
 
   // Generate QR code
-  const registryUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://coralrefuge.vercel.app'}/registry?id=${certificateData.certificateId}`;
+  const registryUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'https://wildreefs.com'}/registry?id=${certificateData.certificateId}`;
   const qrCodeDataUrl = await QRCode.toDataURL(registryUrl, {
     width: 100,
     margin: 1,
@@ -489,7 +489,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   });
 
   // Signature title
-  const signatureText = 'Coral Refuge Team';
+  const signatureText = 'Wild Reefs Team';
   page.drawText(signatureText, {
     x: width / 2 - (helvetica.widthOfTextAtSize(signatureText, 10) / 2),
     y: footerY + 5,
@@ -499,7 +499,7 @@ export async function generateCertificate(data: CertificateData): Promise<Buffer
   });
 
   // Bottom text
-  const bottomText = 'Built with science. Driven by purpose.';
+  const bottomText = 'Keep Reefs Wild';
   page.drawText(bottomText, {
     x: width / 2 - (timesRomanItalic.widthOfTextAtSize(bottomText, 10) / 2),
     y: footerY - 15,
@@ -547,11 +547,11 @@ export function formatCertificateDate(date: Date): string {
 }
 
 /**
- * Generate certificate ID in format: MPA-YEAR-XXXXX
+ * Generate certificate ID in format: WR-MPA-YEAR-XXXXX
  */
 export function generateCertificateId(mpaId: string, sequenceNumber: number): string {
   const year = new Date().getFullYear();
   const mpaPrefix = mpaId.replace('-', '').substring(0, 3).toUpperCase();
   const paddedNumber = sequenceNumber.toString().padStart(5, '0');
-  return `${mpaPrefix}-${year}-${paddedNumber}`;
+  return `WR-${mpaPrefix}-${year}-${paddedNumber}`;
 }

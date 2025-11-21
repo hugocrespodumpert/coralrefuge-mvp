@@ -30,7 +30,7 @@ export default function AboutPage() {
               <strong>But refugia need protection from local stressors: overfishing, pollution, coastal development.</strong>
             </p>
             <p className="text-lg leading-relaxed mb-6">
-              Coral Refuge connects individuals and organizations directly to marine protected areas. Every sponsored hectare funds patrol boats, scientific monitoring, and enforcement—turning paper parks into real sanctuaries.
+              Wild Reefs connects individuals and organizations directly to marine protected areas. Every sponsored hectare funds patrol boats, scientific monitoring, and enforcement—turning paper parks into real sanctuaries.
             </p>
             <p className="text-xl font-bold text-blue-600">
               We&apos;re defending what nature already built to survive.
@@ -211,10 +211,10 @@ export default function AboutPage() {
           </p>
           <div className="mb-8">
             <a
-              href="mailto:info@coralrefuge.org"
+              href="mailto:info@wildreefs.com"
               className="text-xl text-turquoise hover:text-ocean-blue font-semibold"
             >
-              info@coralrefuge.org
+              info@wildreefs.com
             </a>
           </div>
           <Button href="/sponsor" size="lg">

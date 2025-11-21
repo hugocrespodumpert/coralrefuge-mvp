@@ -143,7 +143,7 @@ export default function PublicPortfolioPage() {
               <span className="text-5xl">🪸</span>
             </div>
             <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              {profile.name}&apos;s Coral Refuge Portfolio
+              {profile.name}&apos;s Wild Reefs Portfolio
             </h1>
             {profile.bio && (
               <p className="text-white/90 max-w-2xl mx-auto">
@@ -168,7 +168,7 @@ export default function PublicPortfolioPage() {
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center border border-white/20">
               <div className="text-2xl md:text-3xl font-bold mb-1">{memberSince}</div>
-              <div className="text-sm text-white/80">Guardian Since</div>
+              <div className="text-sm text-white/80">Sponsor Since</div>
             </div>
           </div>
 

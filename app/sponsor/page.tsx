@@ -23,35 +23,24 @@ const mpas: MPA[] = [
   {
     id: 'ras-mohammed',
     name: 'Ras Mohammed National Park',
-    location: 'South Sinai, Egypt',
-    country: '🇪🇬 Egypt',
-    description: 'One of the Red Sea\'s most pristine coral refuges with exceptional biodiversity. Home to over 220 species of coral and 1,000+ species of fish. Established in 1983 with cooler water influx from deep channels providing high climate resilience.',
-    stats: '220+ coral species • 1,000+ fish species',
+    location: 'South Sinai',
+    country: 'Egypt',
+    description: 'One of the Red Sea\'s most pristine coral refuges with exceptional biodiversity and climate resilience.',
+    stats: '2,500 hectares available',
     image: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80',
     photographer: 'NEOM',
-    available: 1200,
+    available: 2500,
   },
   {
     id: 'giftun-islands',
     name: 'Giftun Islands Protected Area',
-    location: 'Hurghada, Red Sea, Egypt',
-    country: '🇪🇬 Egypt',
-    description: 'A biodiversity hotspot established in 1986 with diverse reef structures and strong currents. Home to 196 coral species and 850+ fish species. Demonstrates remarkable resilience to ocean warming through its unique hydrodynamic conditions.',
-    stats: '196 coral species • 850+ fish species',
+    location: 'Hurghada, Red Sea',
+    country: 'Egypt',
+    description: 'A biodiversity hotspot with diverse reef structures and strong currents providing remarkable climate resilience.',
+    stats: '6,400 hectares available',
     image: 'https://images.unsplash.com/photo-1546500840-ae38253aba9b?w=800&q=80',
     photographer: 'Francesco Ungaro',
-    available: 800,
-  },
-  {
-    id: 'wadi-el-gemal',
-    name: 'Wadi El Gemal National Park',
-    location: 'Marsa Alam, Red Sea, Egypt',
-    country: '🇪🇬 Egypt',
-    description: 'Established in 2005, this pristine marine park hosts 450+ fish species, 150+ coral species, along with dugongs and dolphins. Minimal warming impact makes this one of the highest climate resilience refugia in the Red Sea.',
-    stats: '150+ coral species • 450+ fish species',
-    image: 'https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80',
-    photographer: 'Q.U.I',
-    available: 1500,
+    available: 6400,
   },
 ];
 
@@ -180,10 +169,10 @@ function SponsorPageContent() {
       <section className="bg-gradient-to-br from-ocean-deep to-ocean-blue text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Choose Your Coral Refuge to Protect
+            Choose Your Reef to Protect
           </h1>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            Select a marine protected area and sponsor hectares to become a sponsor of climate-resilient coral reefs
+            Select a marine protected area and sponsor hectares of climate-resilient coral reefs
           </p>
           {/* Test Mode Indicator */}
           <div className="mt-4 inline-block bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold">
@@ -194,41 +183,46 @@ function SponsorPageContent() {
 
       {/* MPA Cards */}
       <section className="py-12 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {mpas.map((mpa) => (
               <div
                 key={mpa.id}
-                className={`bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 ${
+                className={`bg-white rounded-2xl overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                   selectedMPA?.id === mpa.id
-                    ? 'ring-4 ring-turquoise scale-105'
-                    : 'hover:shadow-2xl hover:scale-102'
+                    ? 'ring-4 ring-[#00B4D8]'
+                    : ''
                 }`}
               >
-                <div className="relative h-64">
+                {/* Top bar */}
+                <div className="flex justify-between items-center px-6 py-3 bg-gray-50">
+                  <span className="text-sm font-medium text-gray-700">{mpa.country}</span>
+                  <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">Verified</span>
+                </div>
+
+                <div className="relative h-48 aspect-video">
                   <Image
                     src={mpa.image}
                     alt={`${mpa.name} coral reef`}
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute top-4 left-4 bg-white/90 px-3 py-1 rounded-full text-sm font-semibold text-ocean-deep">
-                    {mpa.country}
-                  </div>
                   {selectedMPA?.id === mpa.id && (
-                    <div className="absolute top-4 right-4 bg-turquoise text-white px-3 py-1 rounded-full text-sm font-semibold">
-                      ✓ Selected
+                    <div className="absolute top-4 right-4 bg-[#00B4D8] text-white px-3 py-1 rounded-full text-sm font-semibold">
+                      Selected
                     </div>
                   )}
                 </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-ocean-deep mb-2">{mpa.name}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{mpa.location}</p>
-                  <p className="text-coral font-semibold mb-3">{mpa.stats}</p>
-                  <p className="text-gray-600 text-sm mb-4">{mpa.description}</p>
-                  <p className="text-xs text-gray-400 italic mb-4">
-                    Photo: {mpa.photographer} / The Ocean Agency
-                  </p>
+                <div className="p-6 space-y-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900">{mpa.name}</h3>
+                    <p className="text-sm text-gray-600">{mpa.location}</p>
+                  </div>
+
+                  <div className="flex items-center text-lg font-medium text-gray-700">
+                    <span className="mr-2">📊</span>
+                    <span>{mpa.stats}</span>
+                  </div>
 
                   {selectedMPA?.id === mpa.id ? (
                     <div className="space-y-3">
@@ -254,10 +248,9 @@ function SponsorPageContent() {
                   ) : (
                     <Button
                       onClick={() => handleSelectMPA(mpa)}
-                      variant="secondary"
-                      className="w-full"
+                      className="w-full bg-[#00B4D8] hover:bg-[#0096B8] text-white py-3 rounded-lg"
                     >
-                      Select This Refuge
+                      Sponsor This Reef →
                     </Button>
                   )}
                 </div>
