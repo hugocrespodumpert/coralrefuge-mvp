@@ -12,9 +12,9 @@ export async function sendWaitlistConfirmation(
 ) {
   try {
     const info = await resend.emails.send({
-      from: 'Coral Refuge <hello@wildreefs.com>',
+      from: 'Wild Reefs <hello@wildreefs.com>',
       to: email,
-      subject: 'Welcome to the Coral Refuge Waitlist!',
+      subject: 'Welcome to the Wild Reefs Waitlist!',
       html: `
         <!DOCTYPE html>
         <html>
@@ -33,11 +33,11 @@ export async function sendWaitlistConfirmation(
           <body>
             <div class="container">
               <div class="header">
-                <h1>🪸 Welcome to Coral Refuge!</h1>
+                <h1>Welcome to Wild Reefs!</h1>
               </div>
               <div class="content">
                 <p>Dear ${name},</p>
-                <p>Thank you for joining the waitlist to become a guardian of climate-resilient coral reefs!</p>
+                <p>Thank you for joining the waitlist to become a sponsor of climate-resilient coral reefs!</p>
 
                 <div class="details">
                   <h3>Your Selection:</h3>
@@ -56,10 +56,10 @@ export async function sendWaitlistConfirmation(
 
                 <p>Together, we're protecting coral reefs one hectare at a time.</p>
 
-                <p>With gratitude,<br><strong>The Coral Refuge Team</strong></p>
+                <p>With gratitude,<br><strong>The Wild Reefs Team</strong></p>
               </div>
               <div class="footer">
-                <p>Built with science. Driven by purpose.</p>
+                <p>Keep Reefs Wild</p>
                 <p>hello@wildreefs.com</p>
               </div>
             </div>
@@ -86,9 +86,9 @@ export async function sendPaymentConfirmation(
 ) {
   try {
     const info = await resend.emails.send({
-      from: 'Coral Refuge <hello@wildreefs.com>',
+      from: 'Wild Reefs <hello@wildreefs.com>',
       to: email,
-      subject: '🎉 Your Coral Refuge Sponsorship is Confirmed!',
+      subject: 'Your Wild Reefs Sponsorship is Confirmed!',
       html: `
         <!DOCTYPE html>
         <html>
@@ -108,12 +108,12 @@ export async function sendPaymentConfirmation(
           <body>
             <div class="container">
               <div class="header">
-                <h1>🪸 Thank You, Guardian!</h1>
+                <h1>Thank You, Sponsor!</h1>
               </div>
               <div class="content">
                 <div class="success">
                   <h2 style="margin: 0;">✓ Payment Successful</h2>
-                  <p style="margin: 10px 0 0 0;">You are now officially a Coral Refuge Guardian!</p>
+                  <p style="margin: 10px 0 0 0;">You are now officially a Wild Reefs Sponsor!</p>
                 </div>
 
                 <p>Dear ${name},</p>
@@ -145,10 +145,10 @@ export async function sendPaymentConfirmation(
 
                 <p>Thank you for joining the movement to protect our ocean's last hope.</p>
 
-                <p>With deep gratitude,<br><strong>The Coral Refuge Team</strong></p>
+                <p>With deep gratitude,<br><strong>The Wild Reefs Team</strong></p>
               </div>
               <div class="footer">
-                <p>Built with science. Driven by purpose.</p>
+                <p>Keep Reefs Wild</p>
                 <p>hello@wildreefs.com</p>
               </div>
             </div>
@@ -175,7 +175,7 @@ export async function sendPartnershipNotification(inquiry: {
 }) {
   try {
     const info = await resend.emails.send({
-      from: 'Coral Refuge System <system@wildreefs.com>',
+      from: 'Wild Reefs System <system@wildreefs.com>',
       to: 'hello@wildreefs.com', // Admin email
       subject: `New Partnership Inquiry from ${inquiry.company_name}`,
       html: `
@@ -258,7 +258,7 @@ export async function sendCertificateEmail(
     });
 
     const info = await resend.emails.send({
-      from: 'Coral Refuge <hello@wildreefs.com>',
+      from: 'Wild Reefs <hello@wildreefs.com>',
       to: email,
       subject: `Your Ocean Protection Certificate - ${mpaName}`,
       html: `
@@ -288,7 +288,7 @@ export async function sendCertificateEmail(
           <body>
             <div class="container">
               <div class="header">
-                <h1>🪸 Thank You, Ocean Guardian!</h1>
+                <h1>Thank You, Ocean Sponsor!</h1>
                 <p style="font-size: 18px; margin: 10px 0 0 0; opacity: 0.95;">Your coral reef protection is now active</p>
               </div>
               <div class="content">
@@ -348,12 +348,12 @@ export async function sendCertificateEmail(
                   <a href="${process.env.NEXT_PUBLIC_BASE_URL}/registry?id=${certificateId}" class="button">View in Public Registry →</a>
                 </center>
 
-                <p style="margin-top: 35px; font-size: 16px;">Welcome to the reef guardian community! Together, we're protecting coral reefs one hectare at a time.</p>
+                <p style="margin-top: 35px; font-size: 16px;">Welcome to the reef sponsor community! Together, we're protecting coral reefs one hectare at a time.</p>
 
-                <p style="margin-top: 25px;">With deep gratitude,<br><strong>The Coral Refuge Team</strong></p>
+                <p style="margin-top: 25px;">With deep gratitude,<br><strong>The Wild Reefs Team</strong></p>
               </div>
               <div class="footer">
-                <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Built with science. Driven by purpose.</p>
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Keep Reefs Wild</p>
                 <p style="margin: 5px 0;">Questions? Reply to this email or visit our website</p>
                 <p style="margin: 5px 0; font-size: 12px; color: #999;">hello@wildreefs.com</p>
               </div>
@@ -363,7 +363,7 @@ export async function sendCertificateEmail(
       `,
       attachments: [
         {
-          filename: `Coral-Refuge-Certificate-${certificateId}.pdf`,
+          filename: `Wild-Reefs-Certificate-${certificateId}.pdf`,
           content: certificatePdf,
         },
       ],
@@ -399,7 +399,7 @@ export async function sendGiftCertificateEmail(
     });
 
     const info = await resend.emails.send({
-      from: 'Coral Refuge <hello@wildreefs.com>',
+      from: 'Wild Reefs <hello@wildreefs.com>',
       to: recipientEmail,
       cc: purchaserEmail, // CC the gift giver
       subject: `🎁 ${purchaserName} has gifted you coral reef protection!`,
@@ -499,11 +499,11 @@ export async function sendGiftCertificateEmail(
                   Thank you for being part of the solution to protect our ocean's future.
                 </p>
 
-                <p style="margin-top: 25px;">With deep gratitude,<br><strong>The Coral Refuge Team</strong></p>
+                <p style="margin-top: 25px;">With deep gratitude,<br><strong>The Wild Reefs Team</strong></p>
               </div>
 
               <div class="footer">
-                <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Built with science. Driven by purpose.</p>
+                <p style="margin: 0 0 10px 0; font-weight: bold; color: #0A2463;">Keep Reefs Wild</p>
                 <p style="margin: 5px 0;">Questions? Reply to this email or visit our website</p>
                 <p style="margin: 5px 0; font-size: 12px; color: #999;">hello@wildreefs.com</p>
               </div>
@@ -513,7 +513,7 @@ export async function sendGiftCertificateEmail(
       `,
       attachments: [
         {
-          filename: `Coral-Refuge-Certificate-${certificateId}.pdf`,
+          filename: `Wild-Reefs-Certificate-${certificateId}.pdf`,
           content: certificatePdf,
         },
       ],
@@ -543,7 +543,7 @@ export async function sendAdminNotification(
       : '';
 
     const info = await resend.emails.send({
-      from: 'Coral Refuge System <system@wildreefs.com>',
+      from: 'Wild Reefs System <system@wildreefs.com>',
       to: 'hugocrespodumpert@gmail.com',
       subject: subject,
       html: `

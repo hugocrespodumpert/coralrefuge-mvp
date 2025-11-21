@@ -2,8 +2,8 @@ import Map from '@/components/Map';
 import { getTotalHectares, getTotalProtectionPotential, mpaFeatures } from '@/lib/mpa-data';
 
 export const metadata = {
-  title: 'Explore Coral Refugia Map | Coral Refuge',
-  description: 'Interactive map showing climate-resilient coral reef protected areas available for sponsorship in the Egyptian Red Sea.',
+  title: 'Explore Coral Refugia Map | Wild Reefs',
+  description: 'Interactive map showing climate-resilient coral reef protected areas available for sponsorship.',
 };
 
 export default function MapPage() {

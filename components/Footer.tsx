@@ -9,14 +9,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo & Tagline */}
           <div className="col-span-1 md:col-span-2">
-            <Link href="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-teal rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xl">🪸</span>
-              </div>
-              <span className="font-bold text-xl">Coral Refuge</span>
+            <Link href="/" className="flex items-center mb-4">
+              <span className="font-bold text-2xl text-white">Wild Reefs</span>
             </Link>
-            <p className="font-serif text-white/80 mb-4 italic text-lg">
-              Built with science. Driven by purpose.
+            <p className="text-sm text-gray-400 mb-4">
+              Keep Reefs Wild
             </p>
             <p className="text-white/70 text-sm leading-relaxed">
               Protecting climate-resilient coral reefs through marine protected area sponsorship.
@@ -34,7 +31,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/sponsor" className="text-white/80 hover:text-white transition-colors">
-                  Sponsor a Refuge
+                  Sponsor a Reef
                 </Link>
               </li>
               <li>
@@ -54,8 +51,8 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-lg mb-4">Get in Touch</h3>
             <p className="text-white/80 mb-4">
-              <a href="mailto:info@coralrefuge.org" className="hover:text-white transition-colors">
-                info@coralrefuge.org
+              <a href="mailto:info@wildreefs.com" className="hover:text-white transition-colors">
+                info@wildreefs.com
               </a>
             </p>
             <div className="flex space-x-4">
@@ -97,7 +94,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center text-white/60 text-sm">
-          <p>&copy; {currentYear} Coral Refuge. All rights reserved.</p>
+          <p>&copy; {currentYear} Wild Reefs. All rights reserved.</p>
         </div>
       </div>
     </footer>

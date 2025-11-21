@@ -32,13 +32,10 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-ocean-blue to-teal rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">🪸</span>
-            </div>
-            <span className={`font-bold text-xl ${isScrolled ? 'text-navy-deep' : 'text-white'}`}>
-              Coral Refuge
+          {/* Logo - Text Only */}
+          <Link href="/" className="flex items-center">
+            <span className={`font-bold text-2xl md:text-3xl ${isScrolled ? 'text-[#0A2540]' : 'text-white'}`} style={{ textDecoration: 'none' }}>
+              Wild Reefs
             </span>
           </Link>
 
@@ -57,16 +54,6 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/dashboard"
-              className={`font-medium transition-colors ${
-                isScrolled
-                  ? 'text-gray-700 hover:text-teal'
-                  : 'text-white/90 hover:text-white'
-              }`}
-            >
-              My Portfolio
-            </Link>
             <Button href="/sponsor" size="sm">
               Protect Reefs
             </Button>
@@ -117,13 +104,6 @@ export default function Navigation() {
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/dashboard"
-              className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              My Portfolio
-            </Link>
             <div className="px-4 py-2">
               <Button href="/sponsor" size="sm" className="w-full">
                 Protect Reefs

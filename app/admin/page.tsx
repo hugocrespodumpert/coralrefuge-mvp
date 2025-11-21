@@ -245,7 +245,7 @@ export default function AdminPage() {
             <p className="text-4xl font-bold mb-3">
               ${(sponsorships.reduce((sum, s) => sum + (s.platform_fee_amount || 0), 0) / 100).toFixed(2)}
             </p>
-            <p className="text-blue-100 text-sm">Coral Refuge revenue</p>
+            <p className="text-blue-100 text-sm">Wild Reefs revenue</p>
           </div>
 
           <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 shadow-lg text-white">

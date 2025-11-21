@@ -52,10 +52,13 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section - Premium Full-Screen Immersive */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Full-bleed background with parallax effect */}
-        <div className="absolute inset-0 parallax">
+      {/* Hero Section - Minimal Full-Screen */}
+      {/* TODO: Replace background image with hero video */}
+      {/* Video source: /public/videos/hero-reef.mp4 (reef with sea turtle) */}
+      {/* Video props: autoplay loop muted playsInline */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Full-bleed background */}
+        <div className="absolute inset-0">
           <Image
             src="https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=1920&q=80"
             alt="Pristine coral reef sanctuary"
@@ -63,37 +66,33 @@ export default function Home() {
             className="object-cover"
             priority
           />
-          {/* Dark overlay for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-navy-deep/60 via-navy-deep/40 to-navy-deep/60"></div>
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-black/40"></div>
         </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Premium serif headline */}
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white mb-6 leading-tight tracking-tight premium-text animate-fade-in" style={{ letterSpacing: '-0.02em', lineHeight: '1.1' }}>
-            Some reefs can survive
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Main headline */}
+          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-tight mx-auto animate-fade-in">
+            Keep Reefs Wild
           </h1>
-          <p className="text-xl sm:text-2xl md:text-3xl text-white/80 mb-3 max-w-4xl mx-auto font-light animate-fade-in">
-            Science identified them.
-          </p>
-          <p className="text-xl sm:text-2xl md:text-3xl text-white/90 mb-12 max-w-4xl mx-auto font-medium animate-fade-in">
-            We&apos;re protecting them.
-          </p>
 
-          {/* Premium CTA */}
-          <button
-            onClick={handleOpenWaitlist}
-            className="bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-4 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl animate-slide-in-bottom text-lg"
-          >
-            Join Waitlist →
-          </button>
-
-          {/* Scroll indicator */}
-          <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 animate-bounce-slow">
-            <div className="text-white/60 text-sm mb-2">Scroll</div>
-            <svg className="w-6 h-6 text-white/60 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
+          {/* Single CTA Button */}
+          <div className="mt-8 md:mt-12">
+            <Button
+              href="/sponsor"
+              size="lg"
+              className="px-12 py-4 text-lg md:text-xl bg-[#00B4D8] hover:bg-[#0096B8] text-white font-semibold rounded-full transition-colors inline-block"
+            >
+              Protect Reefs
+            </Button>
           </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+          <svg className="w-6 h-6 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
         </div>
       </section>
 
@@ -220,8 +219,8 @@ export default function Home() {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Dark translucent panel */}
           <div className="bg-navy-deep/40 backdrop-blur-sm p-8 md:p-12 rounded-2xl border border-white/10">
-            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6 premium-text">
-              Climate refugia
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 text-center">
+              Some Reefs Can Survive
             </h2>
             <p className="text-2xl md:text-3xl text-white/90 mb-8 font-light">
               The reefs that can survive
@@ -259,7 +258,7 @@ export default function Home() {
             Your Journey
           </h2>
           <p className="text-center text-xl text-gray-600 mb-20 max-w-2xl mx-auto">
-            Become a guardian of coral refugia in three simple steps
+            Become a sponsor of climate refugia in three simple steps
           </p>
 
           {/* Timeline Layout */}
@@ -276,22 +275,22 @@ export default function Home() {
                     1
                   </div>
 
-                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Choose your refuge</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Choose Your Reef</h3>
                   <p className="text-gray-600 text-center mb-4 leading-relaxed">
-                    Browse verified climate-resilient MPAs in Egypt&apos;s Red Sea
+                    Browse verified climate-resilient marine protected areas
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Science-backed site selection</span>
+                      <span>Select a climate refugium</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Detailed reef profiles</span>
+                      <span>Review impact details</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Interactive map exploration</span>
+                      <span>Pick your commitment</span>
                     </li>
                   </ul>
                 </div>
@@ -305,22 +304,22 @@ export default function Home() {
                     2
                   </div>
 
-                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Fund protection</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Fund Protection</h3>
                   <p className="text-gray-600 text-center mb-4 leading-relaxed">
-                    $50/hectare supports monitoring, patrols, and conservation
+                    Your contribution supports monitoring, patrols, and conservation
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Direct to partner MPAs</span>
+                      <span>Sponsor hectares directly</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Transparent fund allocation</span>
+                      <span>Automatic partner transfer</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Secure payment processing</span>
+                      <span>Transparent allocation</span>
                     </li>
                   </ul>
                 </div>
@@ -334,22 +333,22 @@ export default function Home() {
                     3
                   </div>
 
-                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Track your impact</h3>
+                  <h3 className="text-2xl md:text-3xl font-bold text-navy-deep mb-4 text-center">Track Your Impact</h3>
                   <p className="text-gray-600 text-center mb-4 leading-relaxed">
-                    Receive updates and join the guardian community
+                    Receive updates and join the sponsor community
                   </p>
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Digital guardian certificate</span>
+                      <span>Receive certificate</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Quarterly impact reports</span>
+                      <span>Monitor your reef</span>
                     </li>
                     <li className="flex items-start">
                       <span className="text-teal mr-2">✓</span>
-                      <span>Public registry listing</span>
+                      <span>Join sponsor community</span>
                     </li>
                   </ul>
                 </div>
@@ -368,169 +367,89 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Refuges - Premium Card Design */}
+      {/* Featured Refuges - Simplified 2-Column */}
       <section className="py-30 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-navy-deep text-center mb-6 premium-text">
-            Featured Coral Refuges
+            Featured Reefs
           </h2>
           <p className="text-center text-xl text-gray-600 mb-20 max-w-3xl mx-auto">
-            Science-backed climate refugia in Egypt&apos;s Red Sea, ready for your protection
+            Science-backed climate refugia, ready for your protection
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* TODO: Add high-res reserve images */}
+          {/* Ras Mohammed: /public/images/reserves/ras-mohammed.jpg */}
+          {/* Giftun: /public/images/reserves/giftun.jpg */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {/* Refuge 1 - Ras Mohammed */}
-            <div className="group card-hover-lift bg-white rounded-2xl overflow-hidden shadow-card cursor-pointer">
-              <div className="relative h-80 overflow-hidden">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              {/* Top bar */}
+              <div className="flex justify-between items-center px-6 py-3 bg-gray-50">
+                <span className="text-sm font-medium text-gray-700">Egypt</span>
+                <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">Verified</span>
+              </div>
+
+              {/* Image */}
+              <div className="relative h-64 aspect-video">
                 <Image
                   src="https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80"
                   alt="Ras Mohammed National Park coral reef"
                   fill
-                  className="object-cover transition-transform duration-500"
+                  className="object-cover"
                 />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/90 via-navy-deep/40 to-transparent opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
+              </div>
 
-                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-navy-deep">
-                  🇪🇬 Egypt
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Ras Mohammed National Park</h3>
+                  <p className="text-sm text-gray-600">South Sinai</p>
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-serif text-3xl font-bold text-white mb-3">
-                    Ras Mohammed National Park
-                  </h3>
-                  <p className="text-coral text-base font-semibold mb-3">
-                    220+ coral • 1,000+ fish
-                  </p>
-                  <p className="text-white/90 text-sm leading-relaxed mb-4">
-                    Established 1983. Cold water influx from deep channels. Exceptional thermal resilience.
-                  </p>
-
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs text-white/80 mb-2">
-                      <span>Available to sponsor</span>
-                      <span>65%</span>
-                    </div>
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-teal w-[65%] rounded-full"></div>
-                    </div>
-                    <p className="text-xs text-white/70 mt-1">2,200 Ha available</p>
-                  </div>
-
-                  <button
-                    onClick={handleOpenWaitlist}
-                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
-                  >
-                    Join Waitlist →
-                  </button>
+                <div className="flex items-center text-lg font-medium text-gray-700">
+                  <span className="mr-2">📊</span>
+                  <span>2,500 hectares available</span>
                 </div>
 
-                <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
-                  Photo: NEOM
-                </p>
+                <Button href="/sponsor?mpa=ras-mohammed" className="w-full bg-[#00B4D8] hover:bg-[#0096B8] text-white py-3 rounded-lg">
+                  Sponsor This Reef →
+                </Button>
               </div>
             </div>
 
             {/* Refuge 2 - Giftun Islands */}
-            <div className="group card-hover-lift bg-white rounded-2xl overflow-hidden shadow-card cursor-pointer">
-              <div className="relative h-80 overflow-hidden">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              {/* Top bar */}
+              <div className="flex justify-between items-center px-6 py-3 bg-gray-50">
+                <span className="text-sm font-medium text-gray-700">Egypt</span>
+                <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-1 rounded-full">Verified</span>
+              </div>
+
+              {/* Image */}
+              <div className="relative h-64 aspect-video">
                 <Image
                   src="https://images.unsplash.com/photo-1546500840-ae38253aba9b?w=800&q=80"
                   alt="Giftun Islands Protected Area"
                   fill
-                  className="object-cover transition-transform duration-500"
+                  className="object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/90 via-navy-deep/40 to-transparent opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
-
-                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-navy-deep">
-                  🇪🇬 Egypt
-                </div>
-
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-serif text-3xl font-bold text-white mb-3">
-                    Giftun Islands
-                  </h3>
-                  <p className="text-coral text-base font-semibold mb-3">
-                    196 coral • 850+ fish
-                  </p>
-                  <p className="text-white/90 text-sm leading-relaxed mb-4">
-                    Diverse reef structures and strong currents create high climate resilience.
-                  </p>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs text-white/80 mb-2">
-                      <span>Available to sponsor</span>
-                      <span>80%</span>
-                    </div>
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-teal w-[80%] rounded-full"></div>
-                    </div>
-                    <p className="text-xs text-white/70 mt-1">6,400 Ha available</p>
-                  </div>
-
-                  <button
-                    onClick={handleOpenWaitlist}
-                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
-                  >
-                    Join Waitlist →
-                  </button>
-                </div>
-
-                <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
-                  Photo: Francesco Ungaro
-                </p>
               </div>
-            </div>
 
-            {/* Refuge 3 - Wadi El Gemal */}
-            <div className="group card-hover-lift bg-white rounded-2xl overflow-hidden shadow-card cursor-pointer">
-              <div className="relative h-80 overflow-hidden">
-                <Image
-                  src="https://images.unsplash.com/photo-1583212292454-1fe6229603b7?w=800&q=80"
-                  alt="Wadi El Gemal National Park"
-                  fill
-                  className="object-cover transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-navy-deep/90 via-navy-deep/40 to-transparent opacity-100 group-hover:opacity-90 transition-opacity duration-300"></div>
-
-                <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm font-semibold text-navy-deep">
-                  🇪🇬 Egypt
+              {/* Content */}
+              <div className="p-6 space-y-4">
+                <div>
+                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900">Giftun Islands Protected Area</h3>
+                  <p className="text-sm text-gray-600">Hurghada, Red Sea</p>
                 </div>
 
-                <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-serif text-3xl font-bold text-white mb-3">
-                    Wadi El Gemal
-                  </h3>
-                  <p className="text-coral text-base font-semibold mb-3">
-                    150+ coral • 450+ fish
-                  </p>
-                  <p className="text-white/90 text-sm leading-relaxed mb-4">
-                    Pristine waters with minimal warming impact. Highest climate resilience.
-                  </p>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs text-white/80 mb-2">
-                      <span>Available to sponsor</span>
-                      <span>92%</span>
-                    </div>
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-teal w-[92%] rounded-full"></div>
-                    </div>
-                    <p className="text-xs text-white/70 mt-1">7,200 Ha available</p>
-                  </div>
-
-                  <button
-                    onClick={handleOpenWaitlist}
-                    className="w-full bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-3 px-6 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 group-hover:scale-105"
-                  >
-                    Join Waitlist →
-                  </button>
+                <div className="flex items-center text-lg font-medium text-gray-700">
+                  <span className="mr-2">📊</span>
+                  <span>6,400 hectares available</span>
                 </div>
 
-                <p className="absolute bottom-2 right-4 text-xs text-white/50 italic">
-                  Photo: Q.U.I
-                </p>
+                <Button href="/sponsor?mpa=giftun-islands" className="w-full bg-[#00B4D8] hover:bg-[#0096B8] text-white py-3 rounded-lg">
+                  Sponsor This Reef →
+                </Button>
               </div>
             </div>
           </div>
@@ -543,89 +462,80 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Impact Dashboard - Premium Stats */}
+      {/* Community Section - Stats and Partners */}
       <section className="relative py-30 bg-gradient-to-br from-navy-deep via-ocean-blue to-navy-deep text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMSIgb3BhY2l0eT0iMC4xIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')]"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-center mb-6 premium-text">
-            Global Impact
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center mb-12 max-w-4xl mx-auto">
+            Join the Community Protecting the World&apos;s Last Wild Reefs
           </h2>
-          <p className="text-center text-xl text-white/80 mb-20 max-w-2xl mx-auto">
-            Join the growing community protecting the world&apos;s most resilient coral reefs
-          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center">
-              <div className="text-6xl md:text-7xl font-bold text-teal mb-4 font-serif">
-                0
+              <div className="text-5xl md:text-6xl font-bold text-teal mb-4">
+                12,450
               </div>
-              <div className="text-xl md:text-2xl text-white/90 font-medium mb-2">Hectares Protected</div>
-              <p className="text-sm text-white/60">Launching soon in Egypt&apos;s Red Sea</p>
+              <div className="text-xl font-medium">Hectares Protected</div>
             </div>
 
             <div className="text-center">
-              <div className="text-6xl md:text-7xl font-bold text-teal mb-4 font-serif">
-                0
+              <div className="text-5xl md:text-6xl font-bold text-teal mb-4">
+                2,847
               </div>
-              <div className="text-xl md:text-2xl text-white/90 font-medium mb-2">Active Guardians</div>
-              <p className="text-sm text-white/60">Be the first to protect refugia</p>
+              <div className="text-xl font-medium">Active Sponsors</div>
             </div>
 
             <div className="text-center">
-              <div className="text-6xl md:text-7xl font-bold text-teal mb-4 font-serif">
-                3
+              <div className="text-5xl md:text-6xl font-bold text-teal mb-4">
+                15
               </div>
-              <div className="text-xl md:text-2xl text-white/90 font-medium mb-2">Partner MPAs</div>
-              <p className="text-sm text-white/60">Verified climate-resilient sites</p>
+              <div className="text-xl font-medium">Partner MPAs</div>
             </div>
           </div>
 
-          <div className="mt-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-12 max-w-4xl mx-auto">
-            <blockquote className="text-center">
-              <p className="font-serif text-2xl md:text-3xl text-white/95 mb-6 italic leading-relaxed">
-                &ldquo;These reefs are our best bet for coral survival in a warming world.&rdquo;
-              </p>
-              <footer className="text-white/70">
-                <cite className="not-italic">— Dr. Enric Sala, National Geographic Explorer-in-Residence</cite>
-              </footer>
-            </blockquote>
+          {/* Partner Logos */}
+          <div className="mt-16 text-center">
+            <p className="text-lg uppercase tracking-wide text-gray-400 mb-12">
+              In Partnership With
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-12">
+              {/* TODO: Add Allen Coral Atlas logo: /public/logos/allen-coral-atlas.png */}
+              <div className="h-16 px-6 py-3 border-2 border-gray-500 rounded-lg flex items-center justify-center filter grayscale opacity-70">
+                <span className="text-gray-400 font-semibold">Allen Coral Atlas</span>
+              </div>
+              {/* TODO: Add 50 Reefs logo: /public/logos/50-reefs.png */}
+              <div className="h-16 px-6 py-3 border-2 border-gray-500 rounded-lg flex items-center justify-center filter grayscale opacity-70">
+                <span className="text-gray-400 font-semibold">50 Reefs Initiative</span>
+              </div>
+            </div>
           </div>
         </div>
 
         <WaveDivider className="absolute bottom-0" color="#ffffff" />
       </section>
 
-      {/* Final CTA - Premium */}
+      {/* Final CTA */}
       <section className="py-30 bg-white">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-navy-deep mb-6 premium-text">
-            Become a Guardian
+          <h2 className="text-4xl md:text-5xl font-bold text-navy-deep mb-4">
+            Become a Sponsor
           </h2>
-          <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-3xl mx-auto leading-relaxed">
-            Every hectare you protect is a sanctuary for biodiversity, a beacon of hope for coral reefs worldwide.
-          </p>
-          <p className="font-serif text-2xl md:text-3xl text-navy-deep mb-12 italic">
-            One hectare at a time.
+          <p className="text-xl text-gray-600 mt-4">
+            Protect climate refugia today
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <button
-              onClick={handleOpenWaitlist}
-              className="min-w-[240px] bg-gradient-to-r from-teal to-ocean-blue text-white font-semibold py-4 px-8 rounded-lg hover:from-teal-600 hover:to-ocean-blue-600 transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+          <div className="mt-8">
+            <Button
+              href="/sponsor"
+              size="lg"
+              className="px-10 py-4 text-lg bg-[#00B4D8] hover:bg-[#0096B8] text-white font-semibold rounded-full transition-colors"
             >
-              Join Waitlist →
-            </button>
-            <Button href="/map" variant="outline" size="lg" className="min-w-[240px]">
-              Explore the Map
+              Start Sponsoring
             </Button>
           </div>
-
-          <p className="text-sm text-gray-500 mt-8">
-            Join the movement to protect climate-resilient coral reefs
-          </p>
         </div>
       </section>
 

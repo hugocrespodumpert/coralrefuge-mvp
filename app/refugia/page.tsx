@@ -128,7 +128,7 @@ export default function RefugiaPage() {
             <div className="bg-white rounded-xl p-6 shadow-md">
               <h3 className="font-bold text-xl mb-2">50 Reefs Initiative</h3>
               <p className="text-gray-600">
-                Global scientists identified priority reefs with the highest probability of surviving climate change and repopulating other reefs. Coral Refuge focuses protection on these critical sanctuaries.
+                Global scientists identified priority reefs with the highest probability of surviving climate change and repopulating other reefs. Wild Reefs focuses protection on these critical sanctuaries.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-md">
